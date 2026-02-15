@@ -13,7 +13,8 @@ import java.util.UUID;
 @Table(name = "vehicles", indexes = {
         @Index(name = "idx_vehicles_tenant_id", columnList = "tenant_id"),
         @Index(name = "idx_vehicles_resident_id", columnList = "resident_id"),
-        @Index(name = "idx_vehicles_plate_number", columnList = "plate_number")
+        @Index(name = "idx_vehicles_plate_number", columnList = "plate_number"),
+        @Index(name = "idx_vehicles_qr_sticker_code", columnList = "qr_sticker_code")
 })
 @Getter
 @Setter
@@ -38,6 +39,9 @@ public class Vehicle extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_type", nullable = false)
     private VehicleType vehicleType;
+
+    @Column(name = "qr_sticker_code", updatable = false)
+    private String qrStickerCode;
 
     @Column(name = "sticker_number")
     private String stickerNumber;

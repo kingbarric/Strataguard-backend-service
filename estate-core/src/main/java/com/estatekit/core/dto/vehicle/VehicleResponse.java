@@ -19,6 +19,7 @@ public class VehicleResponse {
     private String model;
     private String color;
     private VehicleType vehicleType;
+    private String qrStickerCode;
     private String stickerNumber;
     private VehicleStatus status;
     private String photoUrl;

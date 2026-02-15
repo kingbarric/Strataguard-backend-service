@@ -87,9 +87,32 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 
 ---
 
-## Phase 3: Visitor Management & QR Passes (~6 days)
+## Phase 3: Vehicle Gate Control System (~5 days) ✅ COMPLETED
 
-### 3A. Visitor Invitation System (Days 11-13)
+### 3A. Vehicle QR Sticker & Gate Sessions (Days 11-13)
+- **QR Sticker Code:** Auto-generated `"VEH-" + UUID` on vehicle registration, immutable, unique per tenant
+- **GateSession entity:** vehicleId, residentId, plateNumber, status (OPEN/CLOSED), entryTime, exitTime, entryGuardId, exitGuardId, notes
+- **GateAccessLog entity:** sessionId, vehicleId, residentId, eventType, guardId, details, success — full audit trail
+- Entry flow: Guard scans vehicle QR → validate ACTIVE status, no duplicate open session → create OPEN session → return vehicle + resident details
+- Partial unique index ensures only ONE open session per vehicle
+- Existing vehicles backfilled with QR codes via V3 migration
+- Gate access logs record every event (ENTRY_SCAN, EXIT_SCAN, EXIT_PASS_VALIDATED, EXIT_PASS_FAILED, etc.)
+
+### 3B. Two-Factor Exit & Remote Approval (Days 14-16)
+- **Exit Pass (HMAC-SHA256):** Payload `vehicleId|residentId|tenantId|nonce|expiresAtMillis`, short expiry (120s), signed token
+- **ExitApprovalRequest entity:** sessionId, vehicleId, residentId, guardId, status (PENDING/APPROVED/DENIED/EXPIRED), expiresAt
+- Two-factor exit: Guard scans vehicle QR + resident's dynamic Exit Pass QR → validate signature, expiry, vehicle match → close session
+- Remote approval: Guard creates request → resident polls pending list → approves/denies → guard completes exit
+- Auto-expiry on read (compare expiresAt to now)
+- Invalid/expired token rejection with audit logging
+- **Endpoints:** `POST /gate/entry`, `POST /gate/exit`, `POST /gate/exit/remote/{sessionId}`, `GET /exit-pass/vehicle/{id}`, `POST /exit-approvals`, `GET /exit-approvals/pending`, `POST /exit-approvals/{id}/approve|deny`, `GET /exit-approvals/{id}/status`
+- Session/log query endpoints for admins and guards
+
+---
+
+## Phase 3.5: Visitor Management & QR Passes (~6 days)
+
+### 3.5A. Visitor Invitation System
 - **Visitor entity:** name, phone, email, purpose, invited_by (resident_id), expected_arrival, expected_departure, status (pending, checked_in, checked_out, expired, denied)
 - **VisitPass entity:** visitor_id, pass_code (UUID), qr_data (encrypted), valid_from, valid_to, single_use/multi_use, max_entries
 - Resident creates visitor invitation → system generates QR pass
@@ -100,16 +123,15 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 - WhatsApp/SMS notification to visitor with QR code link
 - Unit + integration tests
 
-### 3B. Gate Decision Engine (Days 14-16)
-- **GateEvent entity:** timestamp, gate_id, event_type (entry/exit), method (QR, plate, manual), decision (allow/deny), reason, actor (guard_id or system), visitor_id/resident_id
+### 3.5B. Gate Decision Engine
+- Integrate visitor passes with existing gate control system
 - Decision logic (priority order):
   1. Check blacklist → DENY
-  2. Check plate number against resident vehicles → ALLOW
+  2. Check plate number against resident vehicles → ALLOW (via existing QR sticker flow)
   3. Check plate number against pre-registered visitor vehicles → ALLOW (within time window)
   4. Check QR pass validity → ALLOW (within time window, check use count)
   5. Manual security override → ALLOW/DENY with reason
 - Blacklist management (plate numbers, individuals, reasons)
-- Gate event logging (every decision logged with full context)
 - Unit + integration tests for every decision path
 
 ---

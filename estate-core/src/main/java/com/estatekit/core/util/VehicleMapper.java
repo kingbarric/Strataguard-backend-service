@@ -18,6 +18,7 @@ public interface VehicleMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "status", expression = "java(com.estatekit.core.enums.VehicleStatus.ACTIVE)")
+    @Mapping(target = "qrStickerCode", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
     @Mapping(target = "active", expression = "java(true)")
     Vehicle toEntity(CreateVehicleRequest request);
@@ -34,6 +35,7 @@ public interface VehicleMapper {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "qrStickerCode", ignore = true)
     @Mapping(target = "status", ignore = true)
     void updateEntity(UpdateVehicleRequest request, @MappingTarget Vehicle vehicle);
 }

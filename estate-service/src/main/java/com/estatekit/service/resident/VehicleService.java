@@ -51,6 +51,7 @@ public class VehicleService {
         Vehicle vehicle = vehicleMapper.toEntity(request);
         vehicle.setTenantId(tenantId);
         vehicle.setPlateNumber(normalizedPlate);
+        vehicle.setQrStickerCode("VEH-" + UUID.randomUUID());
 
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Created vehicle: {} with plate: {} for tenant: {}", saved.getId(), normalizedPlate, tenantId);
@@ -165,6 +166,7 @@ public class VehicleService {
                 vehicle.setVehicleType(row.getVehicleType());
                 vehicle.setColor(row.getColor());
                 vehicle.setStickerNumber(row.getStickerNumber());
+                vehicle.setQrStickerCode("VEH-" + UUID.randomUUID());
 
                 vehicleRepository.save(vehicle);
                 successCount++;

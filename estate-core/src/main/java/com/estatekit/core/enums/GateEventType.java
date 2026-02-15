@@ -1,0 +1,12 @@
+package com.estatekit.core.enums;
+
+public enum GateEventType {
+    ENTRY_SCAN,
+    EXIT_SCAN,
+    EXIT_PASS_VALIDATED,
+    EXIT_PASS_FAILED,
+    REMOTE_APPROVAL_REQUESTED,
+    REMOTE_APPROVAL_APPROVED,
+    REMOTE_APPROVAL_DENIED,
+    REMOTE_APPROVAL_EXPIRED
+}

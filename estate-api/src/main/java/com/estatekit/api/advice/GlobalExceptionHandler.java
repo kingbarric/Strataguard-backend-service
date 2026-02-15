@@ -2,6 +2,7 @@ package com.estatekit.api.advice;
 
 import com.estatekit.core.dto.common.ApiResponse;
 import com.estatekit.core.exception.DuplicateResourceException;
+import com.estatekit.core.exception.GateAccessDeniedException;
 import com.estatekit.core.exception.InvalidStateTransitionException;
 import com.estatekit.core.exception.ResourceNotFoundException;
 import com.estatekit.core.exception.TenantMismatchException;
@@ -66,6 +67,13 @@ public class GlobalExceptionHandler {
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("Validation failed", errors));
+    }
+
+    @ExceptionHandler(GateAccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleGateAccessDenied(GateAccessDeniedException ex) {
+        log.warn("Gate access denied: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidStateTransitionException.class)

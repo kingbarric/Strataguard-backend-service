@@ -43,4 +43,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
     @Query("SELECT COUNT(v) FROM Vehicle v WHERE v.residentId = :residentId AND v.tenantId = :tenantId AND v.deleted = false")
     long countByResidentIdAndTenantId(@Param("residentId") UUID residentId, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT v FROM Vehicle v WHERE v.qrStickerCode = :qrStickerCode AND v.tenantId = :tenantId AND v.deleted = false")
+    Optional<Vehicle> findByQrStickerCodeAndTenantId(@Param("qrStickerCode") String qrStickerCode,
+                                                      @Param("tenantId") UUID tenantId);
 }

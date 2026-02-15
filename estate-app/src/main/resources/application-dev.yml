@@ -59,6 +59,14 @@ keycloak:
     client-id: ${KEYCLOAK_CLIENT_ID:estate-backend}
     client-secret: ${KEYCLOAK_CLIENT_SECRET:leV5ezNjI9zoV8xnwyRZu5nE7x3uD7B7}
 
+# Gate Control
+gate:
+  exit-pass:
+    secret: dev-secret-key-for-testing-only-not-for-production
+    expiry-seconds: 120
+  exit-approval:
+    expiry-minutes: 5
+
 # Actuator
 management:
   endpoints:
