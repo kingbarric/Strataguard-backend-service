@@ -19,14 +19,17 @@ import java.util.UUID;
 @NoArgsConstructor
 public class GateAccessLog extends BaseEntity {
 
-    @Column(name = "session_id", nullable = false)
+    @Column(name = "session_id")
     private UUID sessionId;
 
-    @Column(name = "vehicle_id", nullable = false)
+    @Column(name = "vehicle_id")
     private UUID vehicleId;
 
-    @Column(name = "resident_id", nullable = false)
+    @Column(name = "resident_id")
     private UUID residentId;
+
+    @Column(name = "visitor_id")
+    private UUID visitorId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false)

@@ -15,6 +15,7 @@ public class GateAccessLogResponse {
     private UUID sessionId;
     private UUID vehicleId;
     private UUID residentId;
+    private UUID visitorId;
     private GateEventType eventType;
     private String guardId;
     private String details;

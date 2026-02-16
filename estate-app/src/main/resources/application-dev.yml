@@ -67,6 +67,11 @@ gate:
   exit-approval:
     expiry-minutes: 5
 
+# Visitor Pass
+visitor:
+  pass:
+    secret: dev-visitor-pass-secret-for-testing-only
+
 # Actuator
 management:
   endpoints:

@@ -1,6 +1,7 @@
 package com.estatekit.api.advice;
 
 import com.estatekit.core.dto.common.ApiResponse;
+import com.estatekit.core.exception.BlacklistedException;
 import com.estatekit.core.exception.DuplicateResourceException;
 import com.estatekit.core.exception.GateAccessDeniedException;
 import com.estatekit.core.exception.InvalidStateTransitionException;
@@ -67,6 +68,13 @@ public class GlobalExceptionHandler {
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("Validation failed", errors));
+    }
+
+    @ExceptionHandler(BlacklistedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBlacklisted(BlacklistedException ex) {
+        log.warn("Blacklisted entry denied: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(GateAccessDeniedException.class)

@@ -11,10 +11,13 @@ import com.estatekit.core.entity.Vehicle;
 import com.estatekit.core.enums.GateEventType;
 import com.estatekit.core.enums.GateSessionStatus;
 import com.estatekit.core.enums.VehicleStatus;
+import com.estatekit.core.exception.BlacklistedException;
 import com.estatekit.core.exception.GateAccessDeniedException;
 import com.estatekit.core.exception.ResourceNotFoundException;
 import com.estatekit.core.util.GateAccessLogMapper;
 import com.estatekit.core.util.GateSessionMapper;
+import com.estatekit.core.util.PlateNumberUtils;
+import com.estatekit.infrastructure.repository.BlacklistRepository;
 import com.estatekit.infrastructure.repository.GateAccessLogRepository;
 import com.estatekit.infrastructure.repository.GateSessionRepository;
 import com.estatekit.infrastructure.repository.ResidentRepository;
@@ -40,6 +43,7 @@ public class GateService {
     private final ResidentRepository residentRepository;
     private final GateSessionRepository gateSessionRepository;
     private final GateAccessLogRepository gateAccessLogRepository;
+    private final BlacklistRepository blacklistRepository;
     private final GateSessionMapper gateSessionMapper;
     private final GateAccessLogMapper gateAccessLogMapper;
     private final ExitPassService exitPassService;
@@ -51,6 +55,14 @@ public class GateService {
         // Lookup vehicle by QR sticker code
         Vehicle vehicle = vehicleRepository.findByQrStickerCodeAndTenantId(request.getQrStickerCode(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle", "qrStickerCode", request.getQrStickerCode()));
+
+        // Check blacklist
+        String normalizedPlate = PlateNumberUtils.normalize(vehicle.getPlateNumber());
+        if (blacklistRepository.isPlateBlacklisted(normalizedPlate, tenantId)) {
+            logEvent(null, vehicle.getId(), vehicle.getResidentId(), GateEventType.VEHICLE_DENIED_BLACKLIST, guardId,
+                    "Vehicle plate blacklisted: " + normalizedPlate, false);
+            throw new BlacklistedException("Vehicle is blacklisted (plate: " + normalizedPlate + ")");
+        }
 
         // Validate vehicle is active
         if (vehicle.getStatus() != VehicleStatus.ACTIVE) {
