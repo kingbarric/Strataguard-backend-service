@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.estatekit</groupId>
-    <artifactId>estate-management</artifactId>
+    <groupId>com.strataguard</groupId>
+    <artifactId>strataguard</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Estate Management</name>
-    <description>Estate Management Backend</description>
+    <name>StrataGuard</name>
+    <description>StrataGuard Backend</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -20,11 +20,11 @@
     </parent>
 
     <modules>
-        <module>estate-core</module>
-        <module>estate-infrastructure</module>
-        <module>estate-service</module>
-        <module>estate-api</module>
-        <module>estate-app</module>
+        <module>strataguard-core</module>
+        <module>strataguard-infrastructure</module>
+        <module>strataguard-service</module>
+        <module>strataguard-api</module>
+        <module>strataguard-app</module>
     </modules>
 
     <properties>

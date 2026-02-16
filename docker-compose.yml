@@ -3,29 +3,29 @@ version: '3.9'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: estatekit-postgres
+    container_name: strataguard-postgres
     environment:
-      POSTGRES_DB: estatekit
-      POSTGRES_USER: estatekit
-      POSTGRES_PASSWORD: estatekit
+      POSTGRES_DB: strataguard
+      POSTGRES_USER: strataguard
+      POSTGRES_PASSWORD: strataguard
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U estatekit"]
+      test: ["CMD-SHELL", "pg_isready -U strataguard"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.5
-    container_name: estatekit-keycloak
+    container_name: strataguard-keycloak
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://host.docker.internal:5432/estatekit
-      KC_DB_USERNAME: estatekit
-      KC_DB_PASSWORD: estatekit
+      KC_DB_URL: jdbc:postgresql://host.docker.internal:5432/strataguard
+      KC_DB_USERNAME: strataguard
+      KC_DB_PASSWORD: strataguard
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 9090
       KC_HTTP_ENABLED: "true"
