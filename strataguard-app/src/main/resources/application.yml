@@ -68,6 +68,18 @@ visitor:
   pass:
     secret: ${VISITOR_PASS_SECRET:change-me-in-production-use-a-strong-visitor-pass-secret}
 
+# Payment - Paystack
+payment:
+  paystack:
+    secret-key: ${PAYSTACK_SECRET_KEY:sk_test_xxxxxxxxxxxxxxxxxxxxx}
+    public-key: ${PAYSTACK_PUBLIC_KEY:pk_test_xxxxxxxxxxxxxxxxxxxxx}
+    base-url: ${PAYSTACK_BASE_URL:https://api.paystack.co}
+
+# Billing
+billing:
+  penalty:
+    rate-per-month: ${BILLING_PENALTY_RATE:0.05}
+
 # Actuator
 management:
   endpoints:

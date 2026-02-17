@@ -4,7 +4,9 @@ import com.strataguard.core.dto.common.ApiResponse;
 import com.strataguard.core.exception.BlacklistedException;
 import com.strataguard.core.exception.DuplicateResourceException;
 import com.strataguard.core.exception.GateAccessDeniedException;
+import com.strataguard.core.exception.InsufficientFundsException;
 import com.strataguard.core.exception.InvalidStateTransitionException;
+import com.strataguard.core.exception.PaymentProcessingException;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.exception.TenantMismatchException;
 import com.strataguard.core.exception.UnauthorizedException;
@@ -88,6 +90,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleInvalidStateTransition(InvalidStateTransitionException ex) {
         log.warn("Invalid state transition: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInsufficientFunds(InsufficientFundsException ex) {
+        log.warn("Insufficient funds: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessing(PaymentProcessingException ex) {
+        log.error("Payment processing error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 

@@ -72,6 +72,18 @@ visitor:
   pass:
     secret: dev-visitor-pass-secret-for-testing-only
 
+# Payment - Paystack
+payment:
+  paystack:
+    secret-key: sk_test_dev_key_for_testing_only
+    public-key: pk_test_dev_key_for_testing_only
+    base-url: https://api.paystack.co
+
+# Billing
+billing:
+  penalty:
+    rate-per-month: 0.05
+
 # Actuator
 management:
   endpoints:
