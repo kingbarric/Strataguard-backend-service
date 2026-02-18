@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,4 +37,7 @@ public interface UnitRepository extends JpaRepository<Unit, UUID> {
 
     @Query("SELECT COUNT(u) FROM Unit u WHERE u.estateId = :estateId AND u.tenantId = :tenantId AND u.deleted = false")
     long countByEstateIdAndTenantId(@Param("estateId") UUID estateId, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT u FROM Unit u WHERE u.estateId = :estateId AND u.tenantId = :tenantId AND u.deleted = false")
+    List<Unit> findByEstateIdAndTenantId(@Param("estateId") UUID estateId, @Param("tenantId") UUID tenantId);
 }

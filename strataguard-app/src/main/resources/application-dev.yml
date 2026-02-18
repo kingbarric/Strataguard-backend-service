@@ -84,6 +84,26 @@ billing:
   penalty:
     rate-per-month: 0.05
 
+# Notification
+notification:
+  termii:
+    api-key:
+    sender-id: StrataGuard
+    base-url: https://api.ng.termii.com/api
+  fcm:
+    credentials-path:
+  retry:
+    max-retries: 3
+    interval-seconds: 60
+
+# Spring Mail (leave empty for dev - senders will gracefully degrade)
+spring.mail:
+  host:
+  port: 587
+  username:
+  password:
+  from: noreply@strataguard.com
+
 # Actuator
 management:
   endpoints:
