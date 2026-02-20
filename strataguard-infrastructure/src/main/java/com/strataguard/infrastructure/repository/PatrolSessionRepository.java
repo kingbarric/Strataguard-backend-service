@@ -33,4 +33,10 @@ public interface PatrolSessionRepository extends JpaRepository<PatrolSession, UU
             "AND p.startedAt >= :from AND p.startedAt < :to")
     Double avgCompletionByEstateAndDateRange(@Param("estateId") UUID estateId, @Param("tenantId") UUID tenantId,
                                               @Param("from") Instant from, @Param("to") Instant to);
+
+    @Query("SELECT COUNT(p) FROM PatrolSession p WHERE p.tenantId = :tenantId AND p.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(p) FROM PatrolSession p WHERE p.status = :status AND p.tenantId = :tenantId AND p.deleted = false")
+    long countByStatusAndTenantId(@Param("status") PatrolSessionStatus status, @Param("tenantId") UUID tenantId);
 }

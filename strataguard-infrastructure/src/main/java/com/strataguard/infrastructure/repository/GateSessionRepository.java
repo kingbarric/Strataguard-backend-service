@@ -40,4 +40,10 @@ public interface GateSessionRepository extends JpaRepository<GateSession, UUID> 
     Page<GateSession> findByStatusAndTenantId(@Param("status") GateSessionStatus status,
                                               @Param("tenantId") UUID tenantId,
                                               Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM GateSession s WHERE s.tenantId = :tenantId AND s.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(s) FROM GateSession s WHERE s.status = :status AND s.tenantId = :tenantId AND s.deleted = false")
+    long countByStatusAndTenantId(@Param("status") GateSessionStatus status, @Param("tenantId") UUID tenantId);
 }

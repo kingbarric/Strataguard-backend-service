@@ -38,4 +38,7 @@ public interface EmergencyAlertRepository extends JpaRepository<EmergencyAlert, 
     @Query("SELECT COUNT(a) FROM EmergencyAlert a WHERE a.tenantId = :tenantId AND a.deleted = false " +
             "AND a.status NOT IN (com.strataguard.core.enums.EmergencyAlertStatus.RESOLVED, com.strataguard.core.enums.EmergencyAlertStatus.FALSE_ALARM)")
     long countActiveByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(a) FROM EmergencyAlert a WHERE a.tenantId = :tenantId AND a.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
 }

@@ -30,4 +30,7 @@ public interface PollRepository extends JpaRepository<Poll, UUID> {
 
     @Query("SELECT COUNT(p) FROM Poll p WHERE p.tenantId = :tenantId AND p.deleted = false")
     long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(p) FROM Poll p WHERE p.status = :status AND p.tenantId = :tenantId AND p.deleted = false")
+    long countByStatusAndTenantId(@Param("status") PollStatus status, @Param("tenantId") UUID tenantId);
 }

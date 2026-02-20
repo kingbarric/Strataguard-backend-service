@@ -40,4 +40,13 @@ public interface UnitRepository extends JpaRepository<Unit, UUID> {
 
     @Query("SELECT u FROM Unit u WHERE u.estateId = :estateId AND u.tenantId = :tenantId AND u.deleted = false")
     List<Unit> findByEstateIdAndTenantId(@Param("estateId") UUID estateId, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(u) FROM Unit u WHERE u.tenantId = :tenantId AND u.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(u) FROM Unit u WHERE u.status = :status AND u.tenantId = :tenantId AND u.deleted = false")
+    long countByStatusAndTenantId(@Param("status") UnitStatus status, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(u) FROM Unit u WHERE u.estateId = :estateId AND u.status = :status AND u.tenantId = :tenantId AND u.deleted = false")
+    long countByEstateIdAndStatusAndTenantId(@Param("estateId") UUID estateId, @Param("status") UnitStatus status, @Param("tenantId") UUID tenantId);
 }

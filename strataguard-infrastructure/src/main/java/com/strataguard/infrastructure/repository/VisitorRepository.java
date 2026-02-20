@@ -49,4 +49,10 @@ public interface VisitorRepository extends JpaRepository<Visitor, UUID> {
 
     @Query("SELECT v FROM Visitor v WHERE v.status = 'PENDING' AND v.tenantId = :tenantId AND v.deleted = false")
     Page<Visitor> findExpectedVisitors(@Param("tenantId") UUID tenantId, Pageable pageable);
+
+    @Query("SELECT COUNT(v) FROM Visitor v WHERE v.tenantId = :tenantId AND v.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(v) FROM Visitor v WHERE v.status = :status AND v.tenantId = :tenantId AND v.deleted = false")
+    long countByStatusAndTenantId(@Param("status") VisitorStatus status, @Param("tenantId") UUID tenantId);
 }

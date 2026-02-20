@@ -40,4 +40,7 @@ public interface ResidentRepository extends JpaRepository<Resident, UUID> {
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Resident r " +
             "WHERE r.userId = :userId AND r.tenantId = :tenantId AND r.deleted = false")
     boolean existsByUserIdAndTenantId(@Param("userId") String userId, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(r) FROM Resident r WHERE r.tenantId = :tenantId AND r.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
 }

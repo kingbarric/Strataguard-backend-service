@@ -28,4 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     @Query("SELECT p FROM Payment p WHERE p.reference = :reference AND p.deleted = false")
     Optional<Payment> findByReference(@Param("reference") String reference);
+
+    @Query("SELECT COUNT(p) FROM Payment p WHERE p.tenantId = :tenantId AND p.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
 }

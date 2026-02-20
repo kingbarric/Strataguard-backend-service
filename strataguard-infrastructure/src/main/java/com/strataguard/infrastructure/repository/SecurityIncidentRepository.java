@@ -55,4 +55,13 @@ public interface SecurityIncidentRepository extends JpaRepository<SecurityIncide
 
     @Query("SELECT i FROM SecurityIncident i WHERE i.tenantId = :tenantId AND i.deleted = false ORDER BY i.createdAt DESC")
     Page<SecurityIncident> findRecentByTenantId(@Param("tenantId") UUID tenantId, Pageable pageable);
+
+    @Query("SELECT COUNT(i) FROM SecurityIncident i WHERE i.tenantId = :tenantId AND i.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(i) FROM SecurityIncident i WHERE i.category = :category AND i.tenantId = :tenantId AND i.deleted = false")
+    long countByCategoryAndTenantId(@Param("category") IncidentCategory category, @Param("tenantId") UUID tenantId);
+
+    @Query("SELECT COUNT(i) FROM SecurityIncident i WHERE i.severity = :severity AND i.tenantId = :tenantId AND i.deleted = false")
+    long countBySeverityAndTenantId(@Param("severity") IncidentSeverity severity, @Param("tenantId") UUID tenantId);
 }

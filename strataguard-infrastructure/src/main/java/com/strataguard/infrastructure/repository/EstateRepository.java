@@ -29,4 +29,10 @@ public interface EstateRepository extends JpaRepository<Estate, UUID> {
             "OR LOWER(e.address) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(e.city) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Estate> searchByTenantId(@Param("tenantId") UUID tenantId, @Param("search") String search, Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Estate e WHERE e.tenantId = :tenantId AND e.deleted = false")
+    long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT e FROM Estate e WHERE e.tenantId = :tenantId AND e.deleted = false")
+    java.util.List<Estate> findAllListByTenantId(@Param("tenantId") UUID tenantId);
 }
