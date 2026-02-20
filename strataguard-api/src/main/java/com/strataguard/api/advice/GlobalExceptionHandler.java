@@ -2,6 +2,7 @@ package com.strataguard.api.advice;
 
 import com.strataguard.core.dto.common.ApiResponse;
 import com.strataguard.core.exception.BlacklistedException;
+import com.strataguard.core.exception.BookingConflictException;
 import com.strataguard.core.exception.DuplicateResourceException;
 import com.strataguard.core.exception.GateAccessDeniedException;
 import com.strataguard.core.exception.InsufficientFundsException;
@@ -83,6 +84,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleGateAccessDenied(GateAccessDeniedException ex) {
         log.warn("Gate access denied: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(BookingConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBookingConflict(BookingConflictException ex) {
+        log.warn("Booking conflict: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 

@@ -113,14 +113,14 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 ## Phase 3.5: Visitor Management & QR Passes (~6 days)
 
 ### 3.5A. Visitor Invitation System
-- **Visitor entity:** name, phone, email, purpose, invited_by (resident_id), expected_arrival, expected_departure, status (pending, checked_in, checked_out, expired, denied)
+- **Visitor entity:** name, phone, email, purpose, invited_by (resident_id), null values allowed. status (pending, checked_in, checked_out, expired, denied)
 - **VisitPass entity:** visitor_id, pass_code (UUID), qr_data (encrypted), valid_from, valid_to, single_use/multi_use, max_entries
 - Resident creates visitor invitation → system generates QR pass
 - QR code generation (ZXing library)
 - Pass validation endpoint (for gate scanning)
-- Visitor pre-registration with vehicle plate
+- Visitor pre-registration with vehicle plate/ or person
 - Recurring visitor passes (e.g., nanny, cleaner — weekly schedule)
-- WhatsApp/SMS notification to visitor with QR code link
+- SMS code from occupant to guard and visitor for manual verification (optional)
 - Unit + integration tests
 
 ### 3.5B. Gate Decision Engine
@@ -187,6 +187,7 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 - Conflict detection (double-booking prevention)
 - Payment integration for paid amenities
 - Cancellation policy enforcement
+- Estate dues payment like for cleaning/cutting grass
 
 ### 6B. Maintenance Requests (Days 29-30)
 - **MaintenanceRequest entity:** unit_id, resident_id, category (plumbing, electrical, structural, general), description, priority, status (open, assigned, in_progress, resolved, closed), assigned_to, photos
@@ -197,7 +198,6 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 
 ### 6C. Utility Tracking (Days 31-32)
 - **UtilityReading entity:** unit_id, type (electricity, water, diesel_contribution), reading, period, cost
-- Prepaid meter reading logging
 - Diesel/generator contribution tracking and splitting
 - Shared utility cost allocation per unit
 - Monthly utility statement generation

@@ -80,6 +80,20 @@ billing:
   penalty:
     rate-per-month: ${BILLING_PENALTY_RATE:0.05}
 
+# Maintenance
+maintenance:
+  sla:
+    urgent-hours: ${MAINTENANCE_SLA_URGENT:4}
+    high-hours: ${MAINTENANCE_SLA_HIGH:24}
+    medium-hours: ${MAINTENANCE_SLA_MEDIUM:72}
+    low-hours: ${MAINTENANCE_SLA_LOW:168}
+
+# Amenity
+amenity:
+  booking:
+    default-advance-days: ${AMENITY_DEFAULT_ADVANCE_DAYS:30}
+    reminder-minutes-before: ${AMENITY_REMINDER_MINUTES:60}
+
 # Notification
 notification:
   termii:
