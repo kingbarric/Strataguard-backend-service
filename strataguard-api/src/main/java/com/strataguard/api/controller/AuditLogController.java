@@ -26,14 +26,6 @@ public class AuditLogController {
 
     private final AuditLogService auditLogService;
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Get audit log entry by ID")
-    public ResponseEntity<ApiResponse<AuditLogResponse>> getAuditLog(@PathVariable UUID id) {
-        AuditLogResponse response = auditLogService.getAuditLog(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
-
     @GetMapping
     @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Get all audit logs (paginated)")
@@ -73,12 +65,20 @@ public class AuditLogController {
     }
 
     @GetMapping("/verify")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Verify audit log hash chain integrity")
     public ResponseEntity<ApiResponse<Boolean>> verifyIntegrity(
             @RequestParam(defaultValue = "100") int limit) {
         boolean valid = auditLogService.verifyIntegrity(limit);
         String message = valid ? "Audit log integrity verified" : "Audit log integrity check FAILED";
         return ResponseEntity.ok(ApiResponse.success(valid, message));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Get audit log entry by ID")
+    public ResponseEntity<ApiResponse<AuditLogResponse>> getAuditLog(@PathVariable UUID id) {
+        AuditLogResponse response = auditLogService.getAuditLog(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

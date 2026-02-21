@@ -36,12 +36,12 @@ public class MaintenanceController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
     @Operation(summary = "Create a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> createRequest(
             @Valid @RequestBody CreateMaintenanceRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        UUID residentId = getResidentId(jwt);
+        UUID residentId = getResidentIdOrNull(jwt);
         MaintenanceResponse response = maintenanceService.createRequest(residentId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Maintenance request created successfully"));

@@ -90,6 +90,13 @@ public class UtilityService {
     }
 
     @Transactional(readOnly = true)
+    public PagedResponse<UtilityMeterResponse> getAllMeters(Pageable pageable) {
+        UUID tenantId = TenantContext.requireTenantId();
+        Page<UtilityMeter> page = meterRepository.findAllByTenantId(tenantId, pageable);
+        return toMeterPagedResponse(page);
+    }
+
+    @Transactional(readOnly = true)
     public PagedResponse<UtilityMeterResponse> getMetersByUnit(UUID unitId, Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
         Page<UtilityMeter> page = meterRepository.findByUnitIdAndTenantId(unitId, tenantId, pageable);

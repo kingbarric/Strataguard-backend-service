@@ -36,7 +36,7 @@ public class MaintenanceRequest extends BaseEntity {
     @Column(name = "estate_id", nullable = false)
     private UUID estateId;
 
-    @Column(name = "resident_id", nullable = false)
+    @Column(name = "resident_id")
     private UUID residentId;
 
     @Column(nullable = false)

@@ -338,7 +338,7 @@ public class MaintenanceService {
         // Notify resident of public comments (if not internal and not by the resident)
         if (!request.isInternal()) {
             MaintenanceRequest maintenanceRequest = requestRepository.findByIdAndTenantId(requestId, tenantId).orElse(null);
-            if (maintenanceRequest != null && !maintenanceRequest.getResidentId().equals(authorId)) {
+            if (maintenanceRequest != null && maintenanceRequest.getResidentId() != null && !maintenanceRequest.getResidentId().equals(authorId)) {
                 try {
                     notificationService.send(SendNotificationRequest.builder()
                             .recipientId(maintenanceRequest.getResidentId())

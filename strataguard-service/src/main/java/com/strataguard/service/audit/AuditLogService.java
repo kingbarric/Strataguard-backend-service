@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -33,6 +34,7 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
     private final AuditLogMapper auditLogMapper;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logEvent(UUID tenantId, String actorId, String actorName, AuditAction action,
                          String entityType, String entityId, String oldValue, String newValue,
                          String ipAddress, String userAgent, String description) {

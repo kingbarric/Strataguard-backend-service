@@ -35,12 +35,12 @@ public class ComplaintController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
     @Operation(summary = "Submit a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> createComplaint(
             @Valid @RequestBody CreateComplaintRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        UUID residentId = getResidentId(jwt);
+        UUID residentId = getResidentIdOrNull(jwt);
         ComplaintResponse response = complaintService.createComplaint(residentId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Complaint submitted successfully"));
@@ -155,5 +155,13 @@ public class ComplaintController {
         Resident resident = residentRepository.findByUserIdAndTenantId(userId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resident", "userId", userId));
         return resident.getId();
+    }
+
+    private UUID getResidentIdOrNull(Jwt jwt) {
+        try {
+            return getResidentId(jwt);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

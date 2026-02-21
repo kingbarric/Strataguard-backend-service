@@ -23,6 +23,9 @@ public interface UtilityMeterRepository extends JpaRepository<UtilityMeter, UUID
     @Query("SELECT m FROM UtilityMeter m WHERE m.estateId = :estateId AND m.tenantId = :tenantId AND m.deleted = false")
     Page<UtilityMeter> findByEstateIdAndTenantId(@Param("estateId") UUID estateId, @Param("tenantId") UUID tenantId, Pageable pageable);
 
+    @Query("SELECT m FROM UtilityMeter m WHERE m.tenantId = :tenantId AND m.deleted = false")
+    Page<UtilityMeter> findAllByTenantId(@Param("tenantId") UUID tenantId, Pageable pageable);
+
     @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM UtilityMeter m " +
             "WHERE m.meterNumber = :meterNumber AND m.tenantId = :tenantId AND m.deleted = false")
     boolean existsByMeterNumberAndTenantId(@Param("meterNumber") String meterNumber, @Param("tenantId") UUID tenantId);

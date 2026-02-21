@@ -54,6 +54,15 @@ public class UtilityController {
         return ResponseEntity.ok(ApiResponse.success(response, "Utility meter updated successfully"));
     }
 
+    @GetMapping("/meters")
+    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @Operation(summary = "Get all utility meters")
+    public ResponseEntity<ApiResponse<PagedResponse<UtilityMeterResponse>>> getAllMeters(
+            @PageableDefault(size = 20) Pageable pageable) {
+        PagedResponse<UtilityMeterResponse> response = utilityService.getAllMeters(pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @GetMapping("/meters/{id}")
     @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
     @Operation(summary = "Get utility meter by ID")
