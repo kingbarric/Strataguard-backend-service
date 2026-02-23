@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook/paystack").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

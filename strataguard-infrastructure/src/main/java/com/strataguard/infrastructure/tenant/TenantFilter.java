@@ -51,6 +51,7 @@ public class TenantFilter extends OncePerRequestFilter {
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/api/v1/auth")
                 || path.startsWith("/api/v1/payments/webhook")
+                || path.startsWith("/ws")
                 || path.equals("/health");
     }
 }

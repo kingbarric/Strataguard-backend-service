@@ -38,5 +38,6 @@ public enum NotificationType {
     PATROL_COMPLETED,
     CAMERA_OFFLINE,
     CAMERA_ONLINE,
-    SHIFT_REMINDER
+    SHIFT_REMINDER,
+    CHAT_MESSAGE
 }

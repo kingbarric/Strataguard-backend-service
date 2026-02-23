@@ -378,3 +378,8 @@ After each phase:
 - **Payment integration:** Use Paystack sandbox extensively before production
 - **Edge sync conflicts:** Keep conflict resolution simple (cloud wins for reference data)
 - **Mobile performance on low-end devices:** Profile early on budget Android phones
+
+##  Addon: WebSocket Chat Module 
+- **Start app, test WebSocket connection with a STOMP client                                                                                                                                              │
+- **Test REST endpoints: create conversation, send message, get history, mark as read                                                                                                                     │
+- **Test real-time: two browser tabs (admin + resident) exchanging messages via WebSocket  
