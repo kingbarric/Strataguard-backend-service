@@ -59,10 +59,7 @@ class UtilityServiceTest {
     private TenancyRepository tenancyRepository;
 
     @Mock
-    private LevyInvoiceRepository invoiceRepository;
-
-    @Mock
-    private LevyTypeRepository levyTypeRepository;
+    private ChargeInvoiceRepository invoiceRepository;
 
     @Mock
     private ResidentRepository residentRepository;
@@ -624,13 +621,13 @@ class UtilityServiceTest {
             reading.setStatus(UtilityReadingStatus.VALIDATED);
             reading.setCost(new BigDecimal("22.50"));
             Tenancy tenancy = buildTenancy();
-            LevyInvoice savedInvoice = new LevyInvoice();
+            ChargeInvoice savedInvoice = new ChargeInvoice();
             savedInvoice.setId(UUID.randomUUID());
 
             when(readingRepository.findUninvoicedValidatedReadings(TENANT_ID)).thenReturn(List.of(reading));
             when(tenancyRepository.findActiveByUnitIdAndTenantId(UNIT_ID, TENANT_ID)).thenReturn(List.of(tenancy));
             when(invoiceRepository.countByInvoiceNumberPrefix(eq(TENANT_ID), any())).thenReturn(0L);
-            when(invoiceRepository.save(any(LevyInvoice.class))).thenReturn(savedInvoice);
+            when(invoiceRepository.save(any(ChargeInvoice.class))).thenReturn(savedInvoice);
             when(readingRepository.save(any(UtilityReading.class))).thenReturn(reading);
 
             int count = utilityService.generateInvoicesFromReadings();
@@ -638,7 +635,7 @@ class UtilityServiceTest {
             assertThat(count).isEqualTo(1);
             assertThat(reading.getStatus()).isEqualTo(UtilityReadingStatus.INVOICED);
             assertThat(reading.getInvoiceId()).isEqualTo(savedInvoice.getId());
-            verify(invoiceRepository).save(any(LevyInvoice.class));
+            verify(invoiceRepository).save(any(ChargeInvoice.class));
             verify(readingRepository).save(reading);
             verify(notificationService).send(any());
         }

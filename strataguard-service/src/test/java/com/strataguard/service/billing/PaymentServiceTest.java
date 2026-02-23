@@ -6,12 +6,12 @@ import com.strataguard.core.dto.common.PagedResponse;
 import com.strataguard.core.dto.payment.PaymentResponse;
 import com.strataguard.core.dto.payment.RecordPaymentRequest;
 import com.strataguard.core.dto.payment.WalletResponse;
-import com.strataguard.core.entity.LevyInvoice;
+import com.strataguard.core.entity.ChargeInvoice;
 import com.strataguard.core.entity.Payment;
 import com.strataguard.core.enums.*;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.util.PaymentMapper;
-import com.strataguard.infrastructure.repository.LevyInvoiceRepository;
+import com.strataguard.infrastructure.repository.ChargeInvoiceRepository;
 import com.strataguard.infrastructure.repository.PaymentRepository;
 import com.strataguard.infrastructure.repository.ResidentRepository;
 import org.junit.jupiter.api.*;
@@ -51,7 +51,7 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @Mock
-    private LevyInvoiceRepository invoiceRepository;
+    private ChargeInvoiceRepository invoiceRepository;
 
     @Mock
     private ResidentRepository residentRepository;
@@ -87,12 +87,12 @@ class PaymentServiceTest {
         TenantContext.clear();
     }
 
-    private LevyInvoice buildInvoice(InvoiceStatus status, BigDecimal paidAmount) {
-        LevyInvoice invoice = new LevyInvoice();
+    private ChargeInvoice buildInvoice(InvoiceStatus status, BigDecimal paidAmount) {
+        ChargeInvoice invoice = new ChargeInvoice();
         invoice.setId(INVOICE_ID);
         invoice.setTenantId(TENANT_ID);
         invoice.setInvoiceNumber("INV-202602-000001");
-        invoice.setLevyTypeId(LEVY_TYPE_ID);
+        invoice.setChargeId(LEVY_TYPE_ID);
         invoice.setUnitId(UNIT_ID);
         invoice.setResidentId(RESIDENT_ID);
         invoice.setAmount(new BigDecimal("1000.00"));
@@ -137,7 +137,7 @@ class PaymentServiceTest {
     private void stubEnrichResponse(Payment payment) {
         PaymentResponse response = buildPaymentResponse();
         when(paymentMapper.toResponse(payment)).thenReturn(response);
-        LevyInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
+        ChargeInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
         when(invoiceRepository.findByIdAndTenantId(payment.getInvoiceId(), payment.getTenantId()))
                 .thenReturn(Optional.of(invoice));
     }
@@ -157,9 +157,9 @@ class PaymentServiceTest {
                     .notes("Bank deposit")
                     .build();
 
-            LevyInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
+            ChargeInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
             // After payment update, invoice shows paid = totalAmount (no overpayment)
-            LevyInvoice updatedInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
+            ChargeInvoice updatedInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
 
             Payment savedPayment = buildPayment();
 
@@ -189,7 +189,7 @@ class PaymentServiceTest {
                     .paymentMethod(PaymentMethod.CASH)
                     .build();
 
-            LevyInvoice paidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
+            ChargeInvoice paidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
 
             when(invoiceRepository.findByIdAndTenantId(INVOICE_ID, TENANT_ID))
                     .thenReturn(Optional.of(paidInvoice));
@@ -212,7 +212,7 @@ class PaymentServiceTest {
                     .paymentMethod(PaymentMethod.CASH)
                     .build();
 
-            LevyInvoice cancelledInvoice = buildInvoice(InvoiceStatus.CANCELLED, BigDecimal.ZERO);
+            ChargeInvoice cancelledInvoice = buildInvoice(InvoiceStatus.CANCELLED, BigDecimal.ZERO);
 
             when(invoiceRepository.findByIdAndTenantId(INVOICE_ID, TENANT_ID))
                     .thenReturn(Optional.of(cancelledInvoice));
@@ -234,9 +234,9 @@ class PaymentServiceTest {
                     .paymentMethod(PaymentMethod.BANK_TRANSFER)
                     .build();
 
-            LevyInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
+            ChargeInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
             // After updateInvoicePayment, paidAmount exceeds totalAmount
-            LevyInvoice overpaidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1200.00"));
+            ChargeInvoice overpaidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1200.00"));
 
             Payment savedPayment = buildPayment();
             savedPayment.setAmount(new BigDecimal("1200.00"));
@@ -246,7 +246,7 @@ class PaymentServiceTest {
                     .thenReturn(Optional.of(overpaidInvoice));   // second call: after updateInvoicePayment (also reused by enrichResponse)
             when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
             when(paymentMapper.toResponse(any(Payment.class))).thenReturn(buildPaymentResponse());
-            when(invoiceRepository.save(any(LevyInvoice.class))).thenReturn(overpaidInvoice);
+            when(invoiceRepository.save(any(ChargeInvoice.class))).thenReturn(overpaidInvoice);
 
             paymentService.recordManualPayment(request);
 
@@ -403,7 +403,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("should apply wallet balance to invoice successfully")
         void shouldApplyWalletToInvoiceSuccessfully() {
-            LevyInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
+            ChargeInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
             WalletResponse walletResponse = WalletResponse.builder()
                     .id(UUID.randomUUID())
                     .residentId(RESIDENT_ID)
@@ -433,7 +433,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("should apply only outstanding amount when wallet has more than enough")
         void shouldApplyOnlyOutstandingWhenWalletHasExcess() {
-            LevyInvoice invoice = buildInvoice(InvoiceStatus.PARTIAL, new BigDecimal("700.00"));
+            ChargeInvoice invoice = buildInvoice(InvoiceStatus.PARTIAL, new BigDecimal("700.00"));
             // Outstanding = 1000 - 700 = 300
             WalletResponse walletResponse = WalletResponse.builder()
                     .id(UUID.randomUUID())
@@ -463,7 +463,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("should throw IllegalStateException when invoice is already paid")
         void shouldThrowWhenInvoiceAlreadyPaid() {
-            LevyInvoice paidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
+            ChargeInvoice paidInvoice = buildInvoice(InvoiceStatus.PAID, new BigDecimal("1000.00"));
 
             when(invoiceRepository.findByIdAndTenantId(INVOICE_ID, TENANT_ID))
                     .thenReturn(Optional.of(paidInvoice));
@@ -480,7 +480,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("should throw IllegalStateException when no wallet balance available")
         void shouldThrowWhenNoWalletBalance() {
-            LevyInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
+            ChargeInvoice invoice = buildInvoice(InvoiceStatus.PENDING, BigDecimal.ZERO);
             WalletResponse walletResponse = WalletResponse.builder()
                     .id(UUID.randomUUID())
                     .residentId(RESIDENT_ID)

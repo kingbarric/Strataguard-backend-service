@@ -53,7 +53,7 @@ class SharedUtilityCostServiceTest {
     private TenancyRepository tenancyRepository;
 
     @Mock
-    private LevyInvoiceRepository invoiceRepository;
+    private ChargeInvoiceRepository invoiceRepository;
 
     @Mock
     private NotificationService notificationService;
@@ -306,13 +306,13 @@ class SharedUtilityCostServiceTest {
                     .thenReturn(List.of(tenancy2));
             when(invoiceRepository.countByInvoiceNumberPrefix(eq(TENANT_ID), any()))
                     .thenReturn(0L);
-            when(invoiceRepository.save(any(LevyInvoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            when(invoiceRepository.save(any(ChargeInvoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             int count = sharedUtilityCostService.generateInvoicesForSharedCost(SHARED_COST_ID);
 
             assertThat(count).isEqualTo(2);
             assertThat(sharedCost.isInvoicesGenerated()).isTrue();
-            verify(invoiceRepository, times(2)).save(any(LevyInvoice.class));
+            verify(invoiceRepository, times(2)).save(any(ChargeInvoice.class));
             verify(sharedCostRepository).save(sharedCost);
             verify(notificationService, times(2)).send(any());
         }
@@ -365,12 +365,12 @@ class SharedUtilityCostServiceTest {
                     .thenReturn(Collections.emptyList());
             when(invoiceRepository.countByInvoiceNumberPrefix(eq(TENANT_ID), any()))
                     .thenReturn(0L);
-            when(invoiceRepository.save(any(LevyInvoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            when(invoiceRepository.save(any(ChargeInvoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             int count = sharedUtilityCostService.generateInvoicesForSharedCost(SHARED_COST_ID);
 
             assertThat(count).isEqualTo(1);
-            verify(invoiceRepository, times(1)).save(any(LevyInvoice.class));
+            verify(invoiceRepository, times(1)).save(any(ChargeInvoice.class));
             verify(notificationService, times(1)).send(any());
         }
     }

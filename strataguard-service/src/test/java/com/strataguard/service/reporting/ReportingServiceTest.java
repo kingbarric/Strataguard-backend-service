@@ -28,7 +28,7 @@ class ReportingServiceTest {
     @Mock private EstateRepository estateRepository;
     @Mock private UnitRepository unitRepository;
     @Mock private ResidentRepository residentRepository;
-    @Mock private LevyInvoiceRepository levyInvoiceRepository;
+    @Mock private ChargeInvoiceRepository chargeInvoiceRepository;
     @Mock private PaymentRepository paymentRepository;
     @Mock private VisitorRepository visitorRepository;
     @Mock private GateSessionRepository gateSessionRepository;
@@ -113,12 +113,12 @@ class ReportingServiceTest {
 
     @Test
     void getRevenueReport_shouldReturnFinancialSummary() {
-        when(levyInvoiceRepository.countByTenantId(tenantId)).thenReturn(200L);
-        when(levyInvoiceRepository.countOverdueByTenantId(tenantId)).thenReturn(15L);
-        when(levyInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(new BigDecimal("500000.00"));
-        when(levyInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(new BigDecimal("400000.00"));
-        when(levyInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(new BigDecimal("75000.00"));
-        when(levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(new BigDecimal("25000.00"));
+        when(chargeInvoiceRepository.countByTenantId(tenantId)).thenReturn(200L);
+        when(chargeInvoiceRepository.countOverdueByTenantId(tenantId)).thenReturn(15L);
+        when(chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(new BigDecimal("500000.00"));
+        when(chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(new BigDecimal("400000.00"));
+        when(chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(new BigDecimal("75000.00"));
+        when(chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(new BigDecimal("25000.00"));
         when(paymentRepository.countByTenantId(tenantId)).thenReturn(180L);
 
         RevenueReportResponse result = reportingService.getRevenueReport();
@@ -133,12 +133,12 @@ class ReportingServiceTest {
 
     @Test
     void getRevenueReport_zeroBilled_shouldReturnZeroCollectionRate() {
-        when(levyInvoiceRepository.countByTenantId(tenantId)).thenReturn(0L);
-        when(levyInvoiceRepository.countOverdueByTenantId(tenantId)).thenReturn(0L);
-        when(levyInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.countByTenantId(tenantId)).thenReturn(0L);
+        when(chargeInvoiceRepository.countOverdueByTenantId(tenantId)).thenReturn(0L);
+        when(chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
         when(paymentRepository.countByTenantId(tenantId)).thenReturn(0L);
 
         RevenueReportResponse result = reportingService.getRevenueReport();
@@ -220,10 +220,10 @@ class ReportingServiceTest {
         when(residentRepository.countByTenantId(tenantId)).thenReturn(150L);
 
         // Financial
-        when(levyInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(new BigDecimal("300000.00"));
-        when(levyInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(new BigDecimal("50000.00"));
-        when(levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(new BigDecimal("20000.00"));
-        when(levyInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(new BigDecimal("370000.00"));
+        when(chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(new BigDecimal("300000.00"));
+        when(chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(new BigDecimal("50000.00"));
+        when(chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(new BigDecimal("20000.00"));
+        when(chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(new BigDecimal("370000.00"));
 
         // Security
         when(securityIncidentRepository.countOpenByTenantId(tenantId)).thenReturn(3L);
@@ -261,10 +261,10 @@ class ReportingServiceTest {
         when(unitRepository.countByTenantId(tenantId)).thenReturn(0L);
         when(unitRepository.countByStatusAndTenantId(UnitStatus.OCCUPIED, tenantId)).thenReturn(0L);
         when(residentRepository.countByTenantId(tenantId)).thenReturn(0L);
-        when(levyInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
-        when(levyInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
+        when(chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId)).thenReturn(BigDecimal.ZERO);
         when(securityIncidentRepository.countOpenByTenantId(tenantId)).thenReturn(0L);
         when(emergencyAlertRepository.countActiveByTenantId(tenantId)).thenReturn(0L);
         when(maintenanceRequestRepository.countByStatusAndTenantId(MaintenanceStatus.OPEN, tenantId)).thenReturn(0L);
