@@ -13,6 +13,7 @@ import com.strataguard.core.enums.UnitStatus;
 import com.strataguard.core.exception.InvalidStateTransitionException;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.util.TenancyMapper;
+import com.strataguard.infrastructure.repository.EstateRepository;
 import com.strataguard.infrastructure.repository.ResidentRepository;
 import com.strataguard.infrastructure.repository.TenancyRepository;
 import com.strataguard.infrastructure.repository.UnitRepository;
@@ -34,6 +35,7 @@ import java.util.UUID;
 public class TenancyService {
 
     private final TenancyRepository tenancyRepository;
+    private final EstateRepository estateRepository;
     private final ResidentRepository residentRepository;
     private final UnitRepository unitRepository;
     private final TenancyMapper tenancyMapper;
@@ -84,6 +86,15 @@ public class TenancyService {
     public PagedResponse<TenancyResponse> getAllTenancies(Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
         Page<Tenancy> page = tenancyRepository.findAllByTenantId(tenantId, pageable);
+        return toPagedResponse(page);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<TenancyResponse> getTenanciesByEstate(UUID estateId, Pageable pageable) {
+        UUID tenantId = TenantContext.requireTenantId();
+        estateRepository.findByIdAndTenantId(estateId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estate", "id", estateId));
+        Page<Tenancy> page = tenancyRepository.findByEstateIdAndTenantId(estateId, tenantId, pageable);
         return toPagedResponse(page);
     }
 

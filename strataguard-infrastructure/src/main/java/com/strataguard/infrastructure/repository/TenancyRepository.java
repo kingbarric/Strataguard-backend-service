@@ -33,6 +33,12 @@ public interface TenancyRepository extends JpaRepository<Tenancy, UUID> {
                                            @Param("tenantId") UUID tenantId,
                                            Pageable pageable);
 
+    @Query("SELECT t FROM Tenancy t JOIN Unit u ON t.unitId = u.id " +
+            "WHERE u.estateId = :estateId AND t.tenantId = :tenantId AND t.deleted = false")
+    Page<Tenancy> findByEstateIdAndTenantId(@Param("estateId") UUID estateId,
+                                             @Param("tenantId") UUID tenantId,
+                                             Pageable pageable);
+
     @Query("SELECT t FROM Tenancy t WHERE t.unitId = :unitId AND t.tenantId = :tenantId " +
             "AND t.status = 'ACTIVE' AND t.deleted = false")
     List<Tenancy> findActiveByUnitIdAndTenantId(@Param("unitId") UUID unitId,

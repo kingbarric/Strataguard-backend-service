@@ -53,6 +53,15 @@ public class TenancyController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/estate/{estateId}")
+    @Operation(summary = "Get all tenancies for an estate")
+    public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getTenanciesByEstate(
+            @PathVariable UUID estateId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        PagedResponse<TenancyResponse> response = tenancyService.getTenanciesByEstate(estateId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @GetMapping("/resident/{residentId}")
     @Operation(summary = "Get all tenancies for a resident")
     public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getTenanciesByResident(
