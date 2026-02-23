@@ -79,6 +79,8 @@ payment:
 billing:
   penalty:
     rate-per-month: ${BILLING_PENALTY_RATE:0.05}
+  reminder:
+    cron: ${BILLING_REMINDER_CRON:0 0 8 * * *}
 
 # Maintenance
 maintenance:

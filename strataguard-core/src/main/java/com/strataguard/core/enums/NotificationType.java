@@ -39,5 +39,7 @@ public enum NotificationType {
     CAMERA_OFFLINE,
     CAMERA_ONLINE,
     SHIFT_REMINDER,
-    CHAT_MESSAGE
+    CHAT_MESSAGE,
+    CHARGE_DUE_REMINDER,
+    CHARGE_OVERDUE
 }

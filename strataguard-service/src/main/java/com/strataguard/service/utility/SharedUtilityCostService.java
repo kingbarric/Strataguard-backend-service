@@ -37,7 +37,7 @@ public class SharedUtilityCostService {
     private final SharedUtilityCostRepository sharedCostRepository;
     private final UnitRepository unitRepository;
     private final TenancyRepository tenancyRepository;
-    private final LevyInvoiceRepository invoiceRepository;
+    private final ChargeInvoiceRepository invoiceRepository;
     private final NotificationService notificationService;
     private final SharedUtilityCostMapper sharedCostMapper;
 
@@ -116,10 +116,11 @@ public class SharedUtilityCostService {
             UUID residentId = activeTenancies.get(0).getResidentId();
             BigDecimal unitCost = computeUnitSpecificCost(sharedCost, unit, allUnits);
 
-            LevyInvoice invoice = new LevyInvoice();
+            ChargeInvoice invoice = new ChargeInvoice();
             invoice.setTenantId(tenantId);
             invoice.setInvoiceNumber(generateInvoiceNumber(tenantId));
-            invoice.setLevyTypeId(sharedCostId); // Reference to shared cost
+            invoice.setChargeType(com.strataguard.core.enums.ChargeType.UTILITY);
+            invoice.setChargeId(sharedCostId);
             invoice.setUnitId(unit.getId());
             invoice.setResidentId(residentId);
             invoice.setAmount(unitCost);

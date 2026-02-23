@@ -1,8 +1,11 @@
 package com.strataguard.core.dto.billing;
 
+import com.strataguard.core.enums.ChargeType;
 import com.strataguard.core.enums.InvoiceStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -11,12 +14,15 @@ import java.util.UUID;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvoiceResponse {
 
     private UUID id;
     private String invoiceNumber;
-    private UUID levyTypeId;
-    private String levyTypeName;
+    private ChargeType chargeType;
+    private UUID chargeId;
+    private String chargeName;
     private UUID unitId;
     private String unitNumber;
     private UUID residentId;

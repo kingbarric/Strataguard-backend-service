@@ -3,12 +3,14 @@ package com.strataguard.service.billing;
 import com.strataguard.core.config.TenantContext;
 import com.strataguard.core.dto.billing.*;
 import com.strataguard.core.dto.common.PagedResponse;
-import com.strataguard.core.entity.LevyInvoice;
-import com.strataguard.core.entity.LevyType;
+import com.strataguard.core.entity.ChargeInvoice;
+import com.strataguard.core.entity.EstateCharge;
+import com.strataguard.core.entity.TenantCharge;
 import com.strataguard.core.entity.Tenancy;
+import com.strataguard.core.enums.ChargeType;
 import com.strataguard.core.enums.InvoiceStatus;
 import com.strataguard.core.exception.ResourceNotFoundException;
-import com.strataguard.core.util.InvoiceMapper;
+import com.strataguard.core.util.ChargeInvoiceMapper;
 import com.strataguard.infrastructure.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +35,14 @@ import java.util.UUID;
 @Transactional
 public class InvoiceService {
 
-    private final LevyInvoiceRepository invoiceRepository;
-    private final LevyTypeRepository levyTypeRepository;
+    private final ChargeInvoiceRepository invoiceRepository;
+    private final EstateChargeRepository estateChargeRepository;
+    private final TenantChargeRepository tenantChargeRepository;
+    private final EstateChargeExclusionRepository exclusionRepository;
     private final UnitRepository unitRepository;
     private final ResidentRepository residentRepository;
     private final TenancyRepository tenancyRepository;
-    private final InvoiceMapper invoiceMapper;
+    private final ChargeInvoiceMapper invoiceMapper;
 
     @Value("${billing.penalty.rate-per-month:0.05}")
     private double penaltyRatePerMonth;
@@ -46,8 +50,7 @@ public class InvoiceService {
     public InvoiceResponse createInvoice(CreateInvoiceRequest request) {
         UUID tenantId = TenantContext.requireTenantId();
 
-        LevyType levyType = levyTypeRepository.findByIdAndTenantId(request.getLevyTypeId(), tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("LevyType", "id", request.getLevyTypeId()));
+        BigDecimal chargeAmount = lookupChargeAmount(request.getChargeId(), request.getChargeType(), tenantId);
 
         unitRepository.findByIdAndTenantId(request.getUnitId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Unit", "id", request.getUnitId()));
@@ -56,21 +59,22 @@ public class InvoiceService {
         List<Tenancy> activeTenancies = tenancyRepository.findActiveByUnitIdAndTenantId(request.getUnitId(), tenantId);
         UUID residentId = activeTenancies.isEmpty() ? null : activeTenancies.get(0).getResidentId();
 
-        LevyInvoice invoice = new LevyInvoice();
+        ChargeInvoice invoice = new ChargeInvoice();
         invoice.setTenantId(tenantId);
         invoice.setInvoiceNumber(generateInvoiceNumber(tenantId));
-        invoice.setLevyTypeId(request.getLevyTypeId());
+        invoice.setChargeType(request.getChargeType());
+        invoice.setChargeId(request.getChargeId());
         invoice.setUnitId(request.getUnitId());
         invoice.setResidentId(residentId);
-        invoice.setAmount(levyType.getAmount());
+        invoice.setAmount(chargeAmount);
         invoice.setPenaltyAmount(BigDecimal.ZERO);
-        invoice.setTotalAmount(levyType.getAmount());
+        invoice.setTotalAmount(chargeAmount);
         invoice.setPaidAmount(BigDecimal.ZERO);
         invoice.setDueDate(request.getDueDate());
         invoice.setStatus(InvoiceStatus.PENDING);
         invoice.setNotes(request.getNotes());
 
-        LevyInvoice saved = invoiceRepository.save(invoice);
+        ChargeInvoice saved = invoiceRepository.save(invoice);
         log.info("Created invoice: {} for unit: {} tenant: {}", saved.getInvoiceNumber(), request.getUnitId(), tenantId);
         return enrichResponse(saved);
     }
@@ -78,8 +82,13 @@ public class InvoiceService {
     public List<InvoiceResponse> bulkGenerateInvoices(BulkInvoiceRequest request) {
         UUID tenantId = TenantContext.requireTenantId();
 
-        LevyType levyType = levyTypeRepository.findByIdAndTenantId(request.getLevyTypeId(), tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("LevyType", "id", request.getLevyTypeId()));
+        ChargeType chargeType = request.getChargeType() != null ? request.getChargeType() : ChargeType.ESTATE_CHARGE;
+        BigDecimal chargeAmount = lookupChargeAmount(request.getChargeId(), chargeType, tenantId);
+
+        // Get excluded tenancy IDs (only for estate charges)
+        List<UUID> excludedTenancyIds = chargeType == ChargeType.ESTATE_CHARGE
+                ? exclusionRepository.findExcludedTenancyIds(request.getChargeId(), tenantId)
+                : List.of();
 
         // Get all units for the estate and find active tenancies
         Page<com.strataguard.core.entity.Unit> unitsPage = unitRepository.findAllByEstateIdAndTenantId(
@@ -90,48 +99,55 @@ public class InvoiceService {
         for (com.strataguard.core.entity.Unit unit : unitsPage.getContent()) {
             List<Tenancy> activeTenancies = tenancyRepository.findActiveByUnitIdAndTenantId(unit.getId(), tenantId);
             if (activeTenancies.isEmpty()) {
-                continue; // Skip units without active tenancies
+                continue;
             }
 
             Tenancy tenancy = activeTenancies.get(0);
 
-            // Skip if an active invoice already exists for this levy type + unit + billing period
+            // Skip excluded tenancies
+            if (excludedTenancyIds.contains(tenancy.getId())) {
+                log.debug("Skipping excluded tenancy: {} for charge: {}", tenancy.getId(), request.getChargeId());
+                continue;
+            }
+
+            // Skip if an active invoice already exists for this charge + unit + billing period
             if (request.getBillingPeriodStart() != null && request.getBillingPeriodEnd() != null) {
-                if (invoiceRepository.existsActiveInvoice(request.getLevyTypeId(), unit.getId(), tenantId,
+                if (invoiceRepository.existsActiveInvoice(request.getChargeId(), unit.getId(), tenantId,
                         request.getBillingPeriodStart(), request.getBillingPeriodEnd())) {
-                    log.debug("Skipping duplicate invoice for unit: {} levy: {}", unit.getId(), request.getLevyTypeId());
+                    log.debug("Skipping duplicate invoice for unit: {} charge: {}", unit.getId(), request.getChargeId());
                     continue;
                 }
             }
 
-            LevyInvoice invoice = new LevyInvoice();
+            ChargeInvoice invoice = new ChargeInvoice();
             invoice.setTenantId(tenantId);
             invoice.setInvoiceNumber(generateInvoiceNumber(tenantId));
-            invoice.setLevyTypeId(request.getLevyTypeId());
+            invoice.setChargeType(chargeType);
+            invoice.setChargeId(request.getChargeId());
             invoice.setUnitId(unit.getId());
             invoice.setResidentId(tenancy.getResidentId());
-            invoice.setAmount(levyType.getAmount());
+            invoice.setAmount(chargeAmount);
             invoice.setPenaltyAmount(BigDecimal.ZERO);
-            invoice.setTotalAmount(levyType.getAmount());
+            invoice.setTotalAmount(chargeAmount);
             invoice.setPaidAmount(BigDecimal.ZERO);
             invoice.setDueDate(request.getDueDate());
             invoice.setStatus(InvoiceStatus.PENDING);
             invoice.setBillingPeriodStart(request.getBillingPeriodStart());
             invoice.setBillingPeriodEnd(request.getBillingPeriodEnd());
 
-            LevyInvoice saved = invoiceRepository.save(invoice);
+            ChargeInvoice saved = invoiceRepository.save(invoice);
             createdInvoices.add(enrichResponse(saved));
         }
 
-        log.info("Bulk generated {} invoices for estate: {} levy: {} tenant: {}",
-                createdInvoices.size(), request.getEstateId(), request.getLevyTypeId(), tenantId);
+        log.info("Bulk generated {} invoices for estate: {} charge: {} tenant: {}",
+                createdInvoices.size(), request.getEstateId(), request.getChargeId(), tenantId);
         return createdInvoices;
     }
 
     @Transactional(readOnly = true)
     public InvoiceResponse getInvoice(UUID id) {
         UUID tenantId = TenantContext.requireTenantId();
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(id, tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", id));
         return enrichResponse(invoice);
     }
@@ -139,28 +155,28 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public PagedResponse<InvoiceResponse> getAllInvoices(Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
-        Page<LevyInvoice> page = invoiceRepository.findAllByTenantId(tenantId, pageable);
+        Page<ChargeInvoice> page = invoiceRepository.findAllByTenantId(tenantId, pageable);
         return toPagedResponse(page);
     }
 
     @Transactional(readOnly = true)
     public PagedResponse<InvoiceResponse> getInvoicesByResident(UUID residentId, Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
-        Page<LevyInvoice> page = invoiceRepository.findByResidentIdAndTenantId(residentId, tenantId, pageable);
+        Page<ChargeInvoice> page = invoiceRepository.findByResidentIdAndTenantId(residentId, tenantId, pageable);
         return toPagedResponse(page);
     }
 
     @Transactional(readOnly = true)
     public PagedResponse<InvoiceResponse> getInvoicesByUnit(UUID unitId, Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
-        Page<LevyInvoice> page = invoiceRepository.findByUnitIdAndTenantId(unitId, tenantId, pageable);
+        Page<ChargeInvoice> page = invoiceRepository.findByUnitIdAndTenantId(unitId, tenantId, pageable);
         return toPagedResponse(page);
     }
 
     @Transactional(readOnly = true)
     public PagedResponse<InvoiceResponse> getOverdueInvoices(Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
-        Page<LevyInvoice> page = invoiceRepository.findOverduePagedByTenantId(tenantId, pageable);
+        Page<ChargeInvoice> page = invoiceRepository.findOverduePagedByTenantId(tenantId, pageable);
         return toPagedResponse(page);
     }
 
@@ -180,13 +196,13 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public PagedResponse<InvoiceResponse> searchInvoices(String query, Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
-        Page<LevyInvoice> page = invoiceRepository.search(tenantId, query, pageable);
+        Page<ChargeInvoice> page = invoiceRepository.search(tenantId, query, pageable);
         return toPagedResponse(page);
     }
 
     public InvoiceResponse cancelInvoice(UUID id) {
         UUID tenantId = TenantContext.requireTenantId();
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(id, tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", id));
 
         if (invoice.getStatus() == InvoiceStatus.PAID) {
@@ -195,7 +211,7 @@ public class InvoiceService {
 
         invoice.setStatus(InvoiceStatus.CANCELLED);
         invoice.setActive(false);
-        LevyInvoice saved = invoiceRepository.save(invoice);
+        ChargeInvoice saved = invoiceRepository.save(invoice);
         log.info("Cancelled invoice: {} for tenant: {}", id, tenantId);
         return enrichResponse(saved);
     }
@@ -204,13 +220,13 @@ public class InvoiceService {
         UUID tenantId = TenantContext.requireTenantId();
         LocalDate today = LocalDate.now();
 
-        List<LevyInvoice> overdueInvoices = invoiceRepository.findOverdueByTenantId(tenantId, today);
+        List<ChargeInvoice> overdueInvoices = invoiceRepository.findOverdueByTenantId(tenantId, today);
         int updatedCount = 0;
 
-        for (LevyInvoice invoice : overdueInvoices) {
+        for (ChargeInvoice invoice : overdueInvoices) {
             long monthsOverdue = ChronoUnit.MONTHS.between(invoice.getDueDate(), today);
             if (monthsOverdue <= 0) {
-                monthsOverdue = 1; // At least 1 month penalty if overdue
+                monthsOverdue = 1;
             }
 
             BigDecimal penaltyAmount = invoice.getAmount()
@@ -229,13 +245,9 @@ public class InvoiceService {
         return updatedCount;
     }
 
-    /**
-     * Update invoice payment status after a payment is recorded.
-     * Called by PaymentService.
-     */
     public void updateInvoicePayment(UUID invoiceId, BigDecimal paymentAmount) {
         UUID tenantId = TenantContext.requireTenantId();
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(invoiceId, tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(invoiceId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", invoiceId));
 
         BigDecimal newPaidAmount = invoice.getPaidAmount().add(paymentAmount);
@@ -251,6 +263,19 @@ public class InvoiceService {
         log.info("Updated invoice {} payment: paidAmount={}, status={}", invoiceId, newPaidAmount, invoice.getStatus());
     }
 
+    private BigDecimal lookupChargeAmount(UUID chargeId, ChargeType chargeType, UUID tenantId) {
+        if (chargeType == ChargeType.ESTATE_CHARGE) {
+            EstateCharge charge = estateChargeRepository.findByIdAndTenantId(chargeId, tenantId)
+                    .orElseThrow(() -> new ResourceNotFoundException("EstateCharge", "id", chargeId));
+            return charge.getAmount();
+        } else if (chargeType == ChargeType.TENANT_CHARGE) {
+            TenantCharge charge = tenantChargeRepository.findByIdAndTenantId(chargeId, tenantId)
+                    .orElseThrow(() -> new ResourceNotFoundException("TenantCharge", "id", chargeId));
+            return charge.getAmount();
+        }
+        throw new IllegalArgumentException("Unsupported charge type: " + chargeType);
+    }
+
     private String generateInvoiceNumber(UUID tenantId) {
         YearMonth yearMonth = YearMonth.now();
         String prefix = String.format("INV-%d%02d-", yearMonth.getYear(), yearMonth.getMonthValue());
@@ -258,11 +283,19 @@ public class InvoiceService {
         return String.format("%s%06d", prefix, count + 1);
     }
 
-    private InvoiceResponse enrichResponse(LevyInvoice invoice) {
+    private InvoiceResponse enrichResponse(ChargeInvoice invoice) {
         InvoiceResponse response = invoiceMapper.toResponse(invoice);
 
-        levyTypeRepository.findByIdAndTenantId(invoice.getLevyTypeId(), invoice.getTenantId())
-                .ifPresent(lt -> response.setLevyTypeName(lt.getName()));
+        // Lookup charge name based on type
+        if (invoice.getChargeType() == ChargeType.ESTATE_CHARGE) {
+            estateChargeRepository.findByIdAndTenantId(invoice.getChargeId(), invoice.getTenantId())
+                    .ifPresent(c -> response.setChargeName(c.getName()));
+        } else if (invoice.getChargeType() == ChargeType.TENANT_CHARGE) {
+            tenantChargeRepository.findByIdAndTenantId(invoice.getChargeId(), invoice.getTenantId())
+                    .ifPresent(c -> response.setChargeName(c.getName()));
+        } else {
+            response.setChargeName("Utility");
+        }
 
         unitRepository.findByIdAndTenantId(invoice.getUnitId(), invoice.getTenantId())
                 .ifPresent(u -> response.setUnitNumber(u.getUnitNumber()));
@@ -275,7 +308,7 @@ public class InvoiceService {
         return response;
     }
 
-    private PagedResponse<InvoiceResponse> toPagedResponse(Page<LevyInvoice> page) {
+    private PagedResponse<InvoiceResponse> toPagedResponse(Page<ChargeInvoice> page) {
         return PagedResponse.<InvoiceResponse>builder()
                 .content(page.getContent().stream().map(this::enrichResponse).toList())
                 .page(page.getNumber())

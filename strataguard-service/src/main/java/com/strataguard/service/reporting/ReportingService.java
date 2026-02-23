@@ -23,7 +23,7 @@ public class ReportingService {
     private final EstateRepository estateRepository;
     private final UnitRepository unitRepository;
     private final ResidentRepository residentRepository;
-    private final LevyInvoiceRepository levyInvoiceRepository;
+    private final ChargeInvoiceRepository chargeInvoiceRepository;
     private final PaymentRepository paymentRepository;
     private final VisitorRepository visitorRepository;
     private final GateSessionRepository gateSessionRepository;
@@ -83,12 +83,12 @@ public class ReportingService {
     public RevenueReportResponse getRevenueReport() {
         UUID tenantId = TenantContext.requireTenantId();
 
-        long totalInvoices = levyInvoiceRepository.countByTenantId(tenantId);
-        long overdueInvoices = levyInvoiceRepository.countOverdueByTenantId(tenantId);
-        BigDecimal totalBilled = levyInvoiceRepository.sumTotalAmountByTenantId(tenantId);
-        BigDecimal totalCollected = levyInvoiceRepository.sumPaidAmountByTenantId(tenantId);
-        BigDecimal totalPending = levyInvoiceRepository.sumPendingAmountByTenantId(tenantId);
-        BigDecimal totalOverdue = levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId);
+        long totalInvoices = chargeInvoiceRepository.countByTenantId(tenantId);
+        long overdueInvoices = chargeInvoiceRepository.countOverdueByTenantId(tenantId);
+        BigDecimal totalBilled = chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId);
+        BigDecimal totalCollected = chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId);
+        BigDecimal totalPending = chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId);
+        BigDecimal totalOverdue = chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId);
         long totalPayments = paymentRepository.countByTenantId(tenantId);
 
         double collectionRate = totalBilled.compareTo(BigDecimal.ZERO) > 0
@@ -190,11 +190,11 @@ public class ReportingService {
         long totalResidents = residentRepository.countByTenantId(tenantId);
 
         // Financial
-        BigDecimal totalRevenue = levyInvoiceRepository.sumPaidAmountByTenantId(tenantId);
-        BigDecimal pendingAmount = levyInvoiceRepository.sumPendingAmountByTenantId(tenantId);
-        BigDecimal overdueAmount = levyInvoiceRepository.sumOverdueAmountByTenantId(tenantId);
+        BigDecimal totalRevenue = chargeInvoiceRepository.sumPaidAmountByTenantId(tenantId);
+        BigDecimal pendingAmount = chargeInvoiceRepository.sumPendingAmountByTenantId(tenantId);
+        BigDecimal overdueAmount = chargeInvoiceRepository.sumOverdueAmountByTenantId(tenantId);
         BigDecimal outstandingAmount = pendingAmount.add(overdueAmount);
-        BigDecimal totalBilled = levyInvoiceRepository.sumTotalAmountByTenantId(tenantId);
+        BigDecimal totalBilled = chargeInvoiceRepository.sumTotalAmountByTenantId(tenantId);
         double collectionRate = totalBilled.compareTo(BigDecimal.ZERO) > 0
                 ? totalRevenue.divide(totalBilled, 4, RoundingMode.HALF_UP).doubleValue() * 100
                 : 0;

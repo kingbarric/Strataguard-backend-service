@@ -4,7 +4,8 @@ import com.strataguard.core.config.TenantContext;
 import com.strataguard.core.dto.common.PagedResponse;
 import com.strataguard.core.dto.notification.SendNotificationRequest;
 import com.strataguard.core.dto.utility.*;
-import com.strataguard.core.entity.LevyInvoice;
+import com.strataguard.core.entity.ChargeInvoice;
+import com.strataguard.core.enums.ChargeType;
 import com.strataguard.core.entity.Tenancy;
 import com.strataguard.core.entity.UtilityMeter;
 import com.strataguard.core.entity.UtilityReading;
@@ -44,8 +45,7 @@ public class UtilityService {
     private final UtilityReadingRepository readingRepository;
     private final UnitRepository unitRepository;
     private final TenancyRepository tenancyRepository;
-    private final LevyInvoiceRepository invoiceRepository;
-    private final LevyTypeRepository levyTypeRepository;
+    private final ChargeInvoiceRepository invoiceRepository;
     private final ResidentRepository residentRepository;
     private final NotificationService notificationService;
     private final UtilityMeterMapper meterMapper;
@@ -272,11 +272,11 @@ public class UtilityService {
 
             UUID residentId = activeTenancies.get(0).getResidentId();
 
-            LevyInvoice invoice = new LevyInvoice();
+            ChargeInvoice invoice = new ChargeInvoice();
             invoice.setTenantId(tenantId);
             invoice.setInvoiceNumber(generateInvoiceNumber(tenantId));
-            // Use a placeholder levy type ID — utility invoices reference reading data
-            invoice.setLevyTypeId(reading.getMeterId());
+            invoice.setChargeType(ChargeType.UTILITY);
+            invoice.setChargeId(reading.getMeterId());
             invoice.setUnitId(reading.getUnitId());
             invoice.setResidentId(residentId);
             invoice.setAmount(reading.getCost());
@@ -288,7 +288,7 @@ public class UtilityService {
             invoice.setBillingPeriodStart(reading.getBillingPeriodStart());
             invoice.setBillingPeriodEnd(reading.getBillingPeriodEnd());
             invoice.setNotes("Utility invoice for " + reading.getUtilityType() + " consumption: " + reading.getConsumption());
-            LevyInvoice savedInvoice = invoiceRepository.save(invoice);
+            ChargeInvoice savedInvoice = invoiceRepository.save(invoice);
 
             reading.setInvoiceId(savedInvoice.getId());
             reading.setStatus(UtilityReadingStatus.INVOICED);

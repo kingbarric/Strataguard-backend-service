@@ -5,19 +5,22 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "levy_types", indexes = {
-        @Index(name = "idx_levy_types_tenant_id", columnList = "tenant_id"),
-        @Index(name = "idx_levy_types_estate_id", columnList = "estate_id")
+@Table(name = "estate_charges", indexes = {
+        @Index(name = "idx_estate_charges_tenant_id", columnList = "tenant_id"),
+        @Index(name = "idx_estate_charges_estate_id", columnList = "estate_id")
 })
 @Getter
 @Setter
 @NoArgsConstructor
-public class LevyType extends BaseEntity {
+public class EstateCharge extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -37,6 +40,10 @@ public class LevyType extends BaseEntity {
 
     @Column(length = 100)
     private String category;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "reminder_days_before", columnDefinition = "jsonb")
+    private List<Integer> reminderDaysBefore;
 
     @Column(nullable = false)
     private boolean active = true;

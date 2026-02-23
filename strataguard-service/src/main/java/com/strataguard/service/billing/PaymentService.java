@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.strataguard.core.config.TenantContext;
 import com.strataguard.core.dto.common.PagedResponse;
 import com.strataguard.core.dto.payment.*;
-import com.strataguard.core.entity.LevyInvoice;
+import com.strataguard.core.entity.ChargeInvoice;
 import com.strataguard.core.entity.Payment;
 import com.strataguard.core.enums.*;
 import com.strataguard.core.exception.PaymentProcessingException;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.util.PaymentMapper;
-import com.strataguard.infrastructure.repository.LevyInvoiceRepository;
+import com.strataguard.infrastructure.repository.ChargeInvoiceRepository;
 import com.strataguard.infrastructure.repository.PaymentRepository;
 import com.strataguard.infrastructure.repository.ResidentRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ import java.util.UUID;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final LevyInvoiceRepository invoiceRepository;
+    private final ChargeInvoiceRepository invoiceRepository;
     private final ResidentRepository residentRepository;
     private final InvoiceService invoiceService;
     private final WalletService walletService;
@@ -50,7 +50,7 @@ public class PaymentService {
     public InitiatePaymentResponse initializePaystackPayment(InitiatePaymentRequest request, String residentEmail) {
         UUID tenantId = TenantContext.requireTenantId();
 
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(request.getInvoiceId(), tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(request.getInvoiceId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", request.getInvoiceId()));
 
         if (invoice.getStatus() == InvoiceStatus.PAID || invoice.getStatus() == InvoiceStatus.CANCELLED) {
@@ -154,7 +154,7 @@ public class PaymentService {
                 invoiceService.updateInvoicePayment(payment.getInvoiceId(), payment.getAmount());
 
                 // Handle overpayment → credit wallet
-                LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(payment.getInvoiceId(), payment.getTenantId())
+                ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(payment.getInvoiceId(), payment.getTenantId())
                         .orElse(null);
                 if (invoice != null && invoice.getPaidAmount().compareTo(invoice.getTotalAmount()) > 0) {
                     BigDecimal excess = invoice.getPaidAmount().subtract(invoice.getTotalAmount());
@@ -184,7 +184,7 @@ public class PaymentService {
     public PaymentResponse recordManualPayment(RecordPaymentRequest request) {
         UUID tenantId = TenantContext.requireTenantId();
 
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(request.getInvoiceId(), tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(request.getInvoiceId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", request.getInvoiceId()));
 
         if (invoice.getStatus() == InvoiceStatus.PAID || invoice.getStatus() == InvoiceStatus.CANCELLED) {
@@ -259,7 +259,7 @@ public class PaymentService {
     public void applyWalletToInvoice(UUID invoiceId, UUID residentId) {
         UUID tenantId = TenantContext.requireTenantId();
 
-        LevyInvoice invoice = invoiceRepository.findByIdAndTenantId(invoiceId, tenantId)
+        ChargeInvoice invoice = invoiceRepository.findByIdAndTenantId(invoiceId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice", "id", invoiceId));
 
         if (invoice.getStatus() == InvoiceStatus.PAID || invoice.getStatus() == InvoiceStatus.CANCELLED) {

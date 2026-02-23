@@ -1,27 +1,31 @@
 package com.strataguard.core.dto.billing;
 
 import com.strataguard.core.enums.LevyFrequency;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.UUID;
+import java.util.List;
 
 @Data
 @Builder
-public class LevyTypeResponse {
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateEstateChargeRequest {
 
-    private UUID id;
     private String name;
+
     private String description;
+
+    @Positive(message = "Amount must be positive")
     private BigDecimal amount;
+
     private LevyFrequency frequency;
-    private UUID estateId;
-    private String estateName;
+
     private String category;
-    private boolean active;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private String createdBy;
+
+    private List<Integer> reminderDaysBefore;
 }

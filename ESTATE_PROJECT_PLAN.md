@@ -136,16 +136,68 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 
 ---
 
-## Phase 4: Billing, Payments & Dues (~6 days)
+## Phase 4: Billing, Payments & Dues (~6 days) — REFACTORED
 
-### 4A. Levy & Dues Management (Days 17-19)
-- **LevyType entity:** name (service charge, development levy, annual dues, special assessment), amount, frequency (monthly, quarterly, annually, one-time), estate_id
-- **LevyInvoice entity:** resident_id/unit_id, levy_type_id, amount, due_date, status (pending, paid, overdue, partial), penalty_amount
-- Invoice generation (manual + scheduled/automated)
-- Penalty/interest calculation (configurable rates per estate)
-- Payment plan / installment support
-- Invoice PDF generation
-- Bulk invoice generation for all units
+### 4A. Charge Model (Separated into TenantCharge & EstateCharge)
+
+The old unified `LevyType` model has been **replaced** with two distinct charge types:
+
+#### TenantCharge (per-tenancy charges)
+- **Table:** `tenant_charges`
+- **Purpose:** Charges specific to a single tenancy (resident+unit combo) — rent, deposit, move-in fee, etc.
+- **Fields:** name, description, amount, frequency, tenancy_id, estate_id, category, reminder_days_before (JSONB array of integers), active
+- **API:** `/api/v1/tenant-charges`
+  - `POST /` — Create tenant charge (ESTATE_ADMIN, SUPER_ADMIN)
+  - `GET /` — List all (paginated)
+  - `GET /{id}` — Get by ID
+  - `PUT /{id}` — Update
+  - `DELETE /{id}` — Soft delete
+  - `GET /tenancy/{tenancyId}` — Get charges for a specific tenancy
+  - `GET /estate/{estateId}` — Get all tenant charges in an estate
+- **DTOs:**
+  - `CreateTenantChargeRequest` — name (required), description, amount (required), frequency (required), tenancyId (required), estateId (required), category, reminderDaysBefore (List<Integer>)
+  - `UpdateTenantChargeRequest` — name, description, amount, frequency, category, reminderDaysBefore (all optional)
+  - `TenantChargeResponse` — id, name, description, amount, frequency, tenancyId, estateId, estateName, category, reminderDaysBefore, active, createdAt, updatedAt
+
+#### EstateCharge (estate-wide charges)
+- **Table:** `estate_charges` (renamed from `levy_types`)
+- **Purpose:** Charges that apply to all tenancies in an estate — maintenance levy, security levy, cleaning, etc.
+- **Fields:** name, description, amount, frequency, estate_id, category, reminder_days_before (JSONB), active
+- **Exclusions:** Specific tenancies can be excluded from an estate charge via `estate_charge_exclusions` table (tenancy_id + reason)
+- **API:** `/api/v1/estate-charges`
+  - `POST /` — Create estate charge (ESTATE_ADMIN, SUPER_ADMIN)
+  - `GET /` — List all (paginated)
+  - `GET /{id}` — Get by ID
+  - `PUT /{id}` — Update
+  - `DELETE /{id}` — Soft delete
+  - `GET /estate/{estateId}` — Get charges for an estate
+  - `POST /{id}/exclusions` — Exclude a tenancy from this charge
+  - `DELETE /{id}/exclusions/{exclusionId}` — Remove exclusion
+  - `GET /{id}/exclusions` — List all exclusions for this charge
+- **DTOs:**
+  - `CreateEstateChargeRequest` — name (required), description, amount (required), frequency (required), estateId (required), category, reminderDaysBefore (List<Integer>)
+  - `UpdateEstateChargeRequest` — name, description, amount, frequency, category, reminderDaysBefore (all optional)
+  - `EstateChargeResponse` — id, name, description, amount, frequency, estateId, estateName, category, reminderDaysBefore, active, createdAt, updatedAt
+  - `CreateExclusionRequest` — tenancyId (required), reason (optional)
+  - `ExclusionResponse` — id, estateChargeId, tenancyId, reason, createdAt
+
+#### ChargeInvoice (unified invoice — renamed from LevyInvoice)
+- **Table:** `charge_invoices` (renamed from `levy_invoices`)
+- **Key changes:** `levy_type_id` → `charge_id`, added `charge_type` field
+- **ChargeType enum:** `TENANT_CHARGE`, `ESTATE_CHARGE`, `UTILITY`
+- **API:** `/api/v1/invoices` (unchanged endpoints)
+- **Updated DTOs:**
+  - `CreateInvoiceRequest` — chargeId (was levyTypeId), chargeType (new), unitId, dueDate, billingPeriodStart, billingPeriodEnd, notes
+  - `BulkInvoiceRequest` — chargeId (was levyTypeId), chargeType (new, optional), billingPeriodStart, billingPeriodEnd, dueDate
+  - `InvoiceResponse` — chargeId (was levyTypeId), chargeName (was levyTypeName), chargeType (new), plus all existing fields
+
+#### Due-Date Reminders
+- **ChargeReminderScheduler** — Daily cron job (default 8 AM, configurable via `BILLING_REMINDER_CRON`)
+- Each charge has `reminderDaysBefore` (e.g., `[7, 3, 1]` = reminders 7, 3, and 1 day before due)
+- Falls back to estate-level default if charge has no reminders set (from `estate.settings` JSON `defaultReminderDays`)
+- Overdue invoices get a one-time `CHARGE_OVERDUE` notification
+- `charge_reminder_logs` table prevents duplicate notifications (unique on invoice_id + days_before)
+- Notification types: `CHARGE_DUE_REMINDER`, `CHARGE_OVERDUE`
 
 ### 4B. Payment Integration (Days 20-22)
 - **Payment entity:** invoice_id, amount, method (card, bank_transfer, ussd, mobile_money), reference, provider_reference, status, metadata
@@ -360,6 +412,11 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 - Edge service Docker image for on-prem deployment
 
 ---
+Addtions
+### 13: Add tenacy form for residents to fill or Landlords can upload a documents then can can download
+    - Tenants will upload the documents for admin to see.
+    - Admin can download the documents for reference or for any other use.
+    - 
 
 ## Estimated Total: ~72 working days
 
@@ -383,3 +440,17 @@ After each phase:
 - **Start app, test WebSocket connection with a STOMP client                                                                                                                                              │
 - **Test REST endpoints: create conversation, send message, get history, mark as read                                                                                                                     │
 - **Test real-time: two browser tabs (admin + resident) exchanging messages via WebSocket  
+
+##  Addon: WebSocket Chat Module 
+- **Start app, test WebSocket connection with a STOMP client                                                                                                                                              │
+- **Test REST endpoints: create conversation, send message, get history, mark as read                                                                                                                     │
+- **Test real-time: two browser tabs (admin + resident) exchanging messages via WebSocket  
+- **Test WebSocket disconnection handling: simulate network loss, verify message persistence and reconnection behavior
+
+
+-
+
+
+
+
+
