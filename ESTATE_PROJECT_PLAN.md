@@ -14,6 +14,28 @@ Building a production-grade, multi-tenant Estate Management and Security SaaS pl
 
 ---
 
+## Test Credentials (Keycloak - Local Dev)
+
+All accounts use **password: `pass1234`** and belong to **tenant_id: `11111111-1111-1111-1111-111111111111`**.
+
+| Role | Username | Email | Roles |
+|------|----------|-------|-------|
+| **ESTATE_ADMIN** | `king@strataguard.com` | king@strataguard.com | ESTATE_ADMIN |
+| **SUPER_ADMIN** | `testadmin` | testadmin@strataguard.com | SUPER_ADMIN, ESTATE_ADMIN |
+| **RESIDENT** | `testuser1@strataguard.com` | testuser1@strataguard.com | RESIDENT |
+
+**Keycloak Admin Console:** http://localhost:9090 (admin / admin)
+
+**OAuth2 Token Request:**
+```
+POST http://localhost:9090/realms/strataguard/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=strataguard-backend&client_secret=leV5ezNjI9zoV8xnwyRZu5nE7x3uD7B7&username=<USERNAME>&password=pass1234
+```
+
+---
+
 ## Phase 1: Foundation + Auth + Estate/Unit CRUD (~5 days)
 
 ### 1A. Backend Project Setup (Day 1)

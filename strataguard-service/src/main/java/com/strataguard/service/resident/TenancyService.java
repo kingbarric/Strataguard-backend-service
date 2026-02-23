@@ -81,6 +81,13 @@ public class TenancyService {
     }
 
     @Transactional(readOnly = true)
+    public PagedResponse<TenancyResponse> getAllTenancies(Pageable pageable) {
+        UUID tenantId = TenantContext.requireTenantId();
+        Page<Tenancy> page = tenancyRepository.findAllByTenantId(tenantId, pageable);
+        return toPagedResponse(page);
+    }
+
+    @Transactional(readOnly = true)
     public PagedResponse<TenancyResponse> getTenanciesByResident(UUID residentId, Pageable pageable) {
         UUID tenantId = TenantContext.requireTenantId();
         residentRepository.findByIdAndTenantId(residentId, tenantId)

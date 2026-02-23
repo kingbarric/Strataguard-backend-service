@@ -38,6 +38,14 @@ public class TenancyController {
                 .body(ApiResponse.success(response, "Tenancy created successfully"));
     }
 
+    @GetMapping
+    @Operation(summary = "Get all tenancies")
+    public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getAllTenancies(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        PagedResponse<TenancyResponse> response = tenancyService.getAllTenancies(pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get tenancy by ID")
     public ResponseEntity<ApiResponse<TenancyResponse>> getTenancy(@PathVariable UUID id) {
