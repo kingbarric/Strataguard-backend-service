@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/chat")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Chat", description = "Chat and messaging endpoints")
 public class ChatController {
 
@@ -88,8 +90,12 @@ public class ChatController {
         UUID residentId = getResidentIdFromJwt(jwt);
         ChatMessageResponse response = messageService.sendMessage(id, residentId, request);
 
-        // Broadcast via WebSocket to conversation topic
-        messagingTemplate.convertAndSend("/topic/conversation." + id, response);
+        // Broadcast via WebSocket to conversation topic (best-effort)
+        try {
+            messagingTemplate.convertAndSend("/topic/conversation." + id, response);
+        } catch (Exception e) {
+            log.warn("Failed to broadcast message via WebSocket: {}", e.getMessage());
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Message sent successfully"));
