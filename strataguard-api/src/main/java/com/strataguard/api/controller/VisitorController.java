@@ -28,7 +28,7 @@ public class VisitorController {
     private final VisitorService visitorService;
 
     @PostMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'visitor.create')")
     @Operation(summary = "Create a visitor invitation")
     public ResponseEntity<ApiResponse<VisitorResponse>> createVisitor(
             @Valid @RequestBody CreateVisitorRequest request) {
@@ -38,7 +38,7 @@ public class VisitorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'visitor.all_read')")
     @Operation(summary = "Get all visitors with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<VisitorResponse>>> getAllVisitors(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -47,7 +47,7 @@ public class VisitorController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'visitor.read')")
     @Operation(summary = "Get visitor by ID")
     public ResponseEntity<ApiResponse<VisitorResponse>> getVisitor(@PathVariable UUID id) {
         VisitorResponse response = visitorService.getVisitor(id);
@@ -55,7 +55,7 @@ public class VisitorController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'visitor.update')")
     @Operation(summary = "Update a visitor")
     public ResponseEntity<ApiResponse<VisitorResponse>> updateVisitor(
             @PathVariable UUID id,
@@ -65,7 +65,7 @@ public class VisitorController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'visitor.delete')")
     @Operation(summary = "Delete a visitor")
     public ResponseEntity<ApiResponse<Void>> deleteVisitor(@PathVariable UUID id) {
         visitorService.deleteVisitor(id);
@@ -73,7 +73,7 @@ public class VisitorController {
     }
 
     @GetMapping("/my-visitors")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'visitor.read')")
     @Operation(summary = "Get visitors invited by the current resident")
     public ResponseEntity<ApiResponse<PagedResponse<VisitorResponse>>> getMyVisitors(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -82,7 +82,7 @@ public class VisitorController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'visitor.all_read')")
     @Operation(summary = "Search visitors by name, phone, or email")
     public ResponseEntity<ApiResponse<PagedResponse<VisitorResponse>>> searchVisitors(
             @RequestParam String query,
@@ -92,7 +92,7 @@ public class VisitorController {
     }
 
     @GetMapping("/expected")
-    @PreAuthorize("hasAnyRole('SECURITY_GUARD', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'visitor.checkin')")
     @Operation(summary = "Get expected (pending) visitors")
     public ResponseEntity<ApiResponse<PagedResponse<VisitorResponse>>> getExpectedVisitors(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -101,7 +101,7 @@ public class VisitorController {
     }
 
     @GetMapping("/{id}/passes")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'visit_pass.read')")
     @Operation(summary = "Get all passes for a visitor")
     public ResponseEntity<ApiResponse<List<VisitPassResponse>>> getVisitorPasses(@PathVariable UUID id) {
         List<VisitPassResponse> response = visitorService.getVisitorPasses(id);
@@ -109,7 +109,7 @@ public class VisitorController {
     }
 
     @PostMapping("/{id}/passes/regenerate")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'visit_pass.create')")
     @Operation(summary = "Regenerate a visit pass for a visitor")
     public ResponseEntity<ApiResponse<VisitPassResponse>> regeneratePass(@PathVariable UUID id) {
         VisitPassResponse response = visitorService.regeneratePass(id);
@@ -118,7 +118,7 @@ public class VisitorController {
     }
 
     @PostMapping("/{id}/passes/{passId}/revoke")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'visit_pass.revoke')")
     @Operation(summary = "Revoke a visit pass")
     public ResponseEntity<ApiResponse<Void>> revokePass(
             @PathVariable UUID id,
@@ -128,7 +128,7 @@ public class VisitorController {
     }
 
     @PostMapping("/check-in")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'visitor.checkin')")
     @Operation(summary = "Check in a visitor using QR token or verification code")
     public ResponseEntity<ApiResponse<VisitorCheckInResponse>> checkIn(
             @Valid @RequestBody VisitorCheckInRequest request) {
@@ -138,7 +138,7 @@ public class VisitorController {
     }
 
     @PostMapping("/check-out")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'visitor.checkout')")
     @Operation(summary = "Check out a visitor")
     public ResponseEntity<ApiResponse<Void>> checkOut(
             @Valid @RequestBody VisitorCheckOutRequest request) {

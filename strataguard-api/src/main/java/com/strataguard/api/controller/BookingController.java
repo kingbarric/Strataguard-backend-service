@@ -37,7 +37,7 @@ public class BookingController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'booking.create')")
     @Operation(summary = "Create a new booking")
     public ResponseEntity<ApiResponse<BookingResponse>> createBooking(
             @Valid @RequestBody CreateBookingRequest request,
@@ -49,7 +49,7 @@ public class BookingController {
     }
 
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'booking.cancel')")
     @Operation(summary = "Cancel a booking")
     public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(
             @PathVariable UUID id,
@@ -61,7 +61,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'booking.read')")
     @Operation(summary = "Get booking by ID")
     public ResponseEntity<ApiResponse<BookingResponse>> getBooking(@PathVariable UUID id) {
         BookingResponse response = bookingService.getBooking(id);
@@ -69,7 +69,7 @@ public class BookingController {
     }
 
     @GetMapping("/my-bookings")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'booking.read')")
     @Operation(summary = "Get my bookings")
     public ResponseEntity<ApiResponse<PagedResponse<BookingResponse>>> getMyBookings(
             @AuthenticationPrincipal Jwt jwt,
@@ -80,7 +80,7 @@ public class BookingController {
     }
 
     @GetMapping("/amenity/{amenityId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'booking.read')")
     @Operation(summary = "Get bookings by amenity")
     public ResponseEntity<ApiResponse<PagedResponse<BookingResponse>>> getBookingsByAmenity(
             @PathVariable UUID amenityId,
@@ -90,7 +90,7 @@ public class BookingController {
     }
 
     @GetMapping("/amenity/{amenityId}/availability")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'booking.read')")
     @Operation(summary = "Get availability for an amenity on a date")
     public ResponseEntity<ApiResponse<AvailabilityResponse>> getAvailability(
             @PathVariable UUID amenityId,
@@ -100,7 +100,7 @@ public class BookingController {
     }
 
     @PostMapping("/amenity/{amenityId}/waitlist")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'booking.create')")
     @Operation(summary = "Join waitlist for an amenity slot")
     public ResponseEntity<ApiResponse<WaitlistResponse>> joinWaitlist(
             @PathVariable UUID amenityId,

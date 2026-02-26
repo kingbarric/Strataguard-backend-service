@@ -29,7 +29,7 @@ public class EstateController {
     private final EstateService estateService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'estate.create')")
     @Operation(summary = "Create a new estate")
     public ResponseEntity<ApiResponse<EstateResponse>> createEstate(
             @Valid @RequestBody CreateEstateRequest request) {
@@ -39,6 +39,7 @@ public class EstateController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'estate.read')")
     @Operation(summary = "Get estate by ID")
     public ResponseEntity<ApiResponse<EstateResponse>> getEstate(@PathVariable UUID id) {
         EstateResponse response = estateService.getEstate(id);
@@ -46,6 +47,7 @@ public class EstateController {
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission(null, 'estate.read')")
     @Operation(summary = "Get all estates with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<EstateResponse>>> getAllEstates(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -54,6 +56,7 @@ public class EstateController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasPermission(null, 'estate.read')")
     @Operation(summary = "Search estates by name, address, or city")
     public ResponseEntity<ApiResponse<PagedResponse<EstateResponse>>> searchEstates(
             @RequestParam String query,
@@ -63,7 +66,7 @@ public class EstateController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'estate.update')")
     @Operation(summary = "Update an estate")
     public ResponseEntity<ApiResponse<EstateResponse>> updateEstate(
             @PathVariable UUID id,
@@ -73,7 +76,7 @@ public class EstateController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'estate.delete')")
     @Operation(summary = "Soft-delete an estate")
     public ResponseEntity<ApiResponse<Void>> deleteEstate(@PathVariable UUID id) {
         estateService.deleteEstate(id);

@@ -36,7 +36,7 @@ public class MaintenanceController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.create')")
     @Operation(summary = "Create a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> createRequest(
             @Valid @RequestBody CreateMaintenanceRequest request,
@@ -48,7 +48,7 @@ public class MaintenanceController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.assign')")
     @Operation(summary = "Update a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> updateRequest(
             @PathVariable UUID id,
@@ -58,7 +58,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get maintenance request by ID")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> getRequest(@PathVariable UUID id) {
         MaintenanceResponse response = maintenanceService.getRequest(id);
@@ -66,7 +66,7 @@ public class MaintenanceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get all maintenance requests")
     public ResponseEntity<ApiResponse<PagedResponse<MaintenanceResponse>>> getAllRequests(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -75,7 +75,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/my-requests")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get my maintenance requests")
     public ResponseEntity<ApiResponse<PagedResponse<MaintenanceResponse>>> getMyRequests(
             @AuthenticationPrincipal Jwt jwt,
@@ -86,7 +86,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get maintenance requests by estate")
     public ResponseEntity<ApiResponse<PagedResponse<MaintenanceResponse>>> getRequestsByEstate(
             @PathVariable UUID estateId,
@@ -96,7 +96,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get maintenance requests by status")
     public ResponseEntity<ApiResponse<PagedResponse<MaintenanceResponse>>> getRequestsByStatus(
             @PathVariable MaintenanceStatus status,
@@ -106,7 +106,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Search maintenance requests")
     public ResponseEntity<ApiResponse<PagedResponse<MaintenanceResponse>>> searchRequests(
             @RequestParam String query,
@@ -116,7 +116,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/assign")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.assign')")
     @Operation(summary = "Assign a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> assignRequest(
             @PathVariable UUID id,
@@ -126,7 +126,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/cost-estimate")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.assign')")
     @Operation(summary = "Submit cost estimate for a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> submitCostEstimate(
             @PathVariable UUID id,
@@ -136,7 +136,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/approve-cost")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'maintenance.assign')")
     @Operation(summary = "Approve cost estimate")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> approveCostEstimate(
             @PathVariable UUID id,
@@ -147,7 +147,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/resolve")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.assign')")
     @Operation(summary = "Resolve a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> resolveRequest(
             @PathVariable UUID id,
@@ -158,7 +158,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'maintenance.close')")
     @Operation(summary = "Close a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> closeRequest(@PathVariable UUID id) {
         MaintenanceResponse response = maintenanceService.closeRequest(id);
@@ -166,7 +166,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'maintenance.close')")
     @Operation(summary = "Cancel a maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> cancelRequest(@PathVariable UUID id) {
         MaintenanceResponse response = maintenanceService.cancelRequest(id);
@@ -174,7 +174,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/rate")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'maintenance.rate')")
     @Operation(summary = "Rate a resolved maintenance request")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> rateRequest(
             @PathVariable UUID id,
@@ -186,7 +186,7 @@ public class MaintenanceController {
     }
 
     @PostMapping("/{id}/comments")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.comment')")
     @Operation(summary = "Add comment to a maintenance request")
     public ResponseEntity<ApiResponse<CommentResponse>> addComment(
             @PathVariable UUID id,
@@ -204,7 +204,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/{id}/comments")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get comments for a maintenance request")
     public ResponseEntity<ApiResponse<PagedResponse<CommentResponse>>> getComments(
             @PathVariable UUID id,
@@ -216,7 +216,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'maintenance.read')")
     @Operation(summary = "Get maintenance dashboard")
     public ResponseEntity<ApiResponse<MaintenanceDashboardResponse>> getDashboard() {
         MaintenanceDashboardResponse response = maintenanceService.getDashboard();

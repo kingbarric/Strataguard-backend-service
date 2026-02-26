@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,4 +32,8 @@ public class RegisterRequest {
 
     @NotBlank(message = "Role is required")
     private String role;
+
+    private UUID estateId;   // optional: auto-create membership
+
+    private UUID tenantId;   // optional: join existing tenant
 }

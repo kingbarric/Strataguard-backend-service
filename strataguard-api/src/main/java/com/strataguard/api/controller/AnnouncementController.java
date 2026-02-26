@@ -29,7 +29,7 @@ public class AnnouncementController {
     private final AnnouncementService announcementService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.create')")
     @Operation(summary = "Create an announcement")
     public ResponseEntity<ApiResponse<AnnouncementResponse>> createAnnouncement(
             @Valid @RequestBody CreateAnnouncementRequest request,
@@ -42,7 +42,7 @@ public class AnnouncementController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.update')")
     @Operation(summary = "Update an announcement")
     public ResponseEntity<ApiResponse<AnnouncementResponse>> updateAnnouncement(
             @PathVariable UUID id,
@@ -52,7 +52,7 @@ public class AnnouncementController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'announcement.read')")
     @Operation(summary = "Get announcement by ID")
     public ResponseEntity<ApiResponse<AnnouncementResponse>> getAnnouncement(@PathVariable UUID id) {
         AnnouncementResponse response = announcementService.getAnnouncement(id);
@@ -60,7 +60,7 @@ public class AnnouncementController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.read')")
     @Operation(summary = "Get all announcements (admin view)")
     public ResponseEntity<ApiResponse<PagedResponse<AnnouncementResponse>>> getAllAnnouncements(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -69,7 +69,7 @@ public class AnnouncementController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.read')")
     @Operation(summary = "Get announcements by estate (admin view)")
     public ResponseEntity<ApiResponse<PagedResponse<AnnouncementResponse>>> getAnnouncementsByEstate(
             @PathVariable UUID estateId,
@@ -79,7 +79,7 @@ public class AnnouncementController {
     }
 
     @GetMapping("/estate/{estateId}/active")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'announcement.read')")
     @Operation(summary = "Get active announcements for estate")
     public ResponseEntity<ApiResponse<PagedResponse<AnnouncementResponse>>> getActiveAnnouncements(
             @PathVariable UUID estateId,
@@ -89,7 +89,7 @@ public class AnnouncementController {
     }
 
     @PostMapping("/{id}/publish")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.publish')")
     @Operation(summary = "Publish an announcement")
     public ResponseEntity<ApiResponse<AnnouncementResponse>> publishAnnouncement(@PathVariable UUID id) {
         AnnouncementResponse response = announcementService.publishAnnouncement(id);
@@ -97,7 +97,7 @@ public class AnnouncementController {
     }
 
     @PostMapping("/{id}/unpublish")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'announcement.publish')")
     @Operation(summary = "Unpublish an announcement")
     public ResponseEntity<ApiResponse<AnnouncementResponse>> unpublishAnnouncement(@PathVariable UUID id) {
         AnnouncementResponse response = announcementService.unpublishAnnouncement(id);
@@ -105,7 +105,7 @@ public class AnnouncementController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'announcement.delete')")
     @Operation(summary = "Delete an announcement")
     public ResponseEntity<ApiResponse<Void>> deleteAnnouncement(@PathVariable UUID id) {
         announcementService.deleteAnnouncement(id);

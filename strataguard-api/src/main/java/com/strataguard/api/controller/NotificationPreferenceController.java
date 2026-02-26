@@ -30,7 +30,7 @@ public class NotificationPreferenceController {
     private final ResidentRepository residentRepository;
 
     @GetMapping("/my-preferences")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.preference_manage')")
     @Operation(summary = "Get current resident's notification preferences")
     public ResponseEntity<ApiResponse<List<NotificationPreferenceResponse>>> getMyPreferences(
             @AuthenticationPrincipal Jwt jwt) {
@@ -40,7 +40,7 @@ public class NotificationPreferenceController {
     }
 
     @PutMapping("/my-preferences")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.preference_manage')")
     @Operation(summary = "Update a notification preference")
     public ResponseEntity<ApiResponse<NotificationPreferenceResponse>> updateMyPreference(
             @Valid @RequestBody NotificationPreferenceRequest request,

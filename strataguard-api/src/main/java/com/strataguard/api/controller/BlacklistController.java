@@ -30,7 +30,7 @@ public class BlacklistController {
     private final BlacklistService blacklistService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'blacklist.create')")
     @Operation(summary = "Add a new blacklist entry")
     public ResponseEntity<ApiResponse<BlacklistResponse>> create(
             @Valid @RequestBody CreateBlacklistRequest request) {
@@ -40,7 +40,7 @@ public class BlacklistController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'blacklist.read')")
     @Operation(summary = "Get all blacklist entries with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<BlacklistResponse>>> getAll(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -49,7 +49,7 @@ public class BlacklistController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'blacklist.read')")
     @Operation(summary = "Get blacklist entry by ID")
     public ResponseEntity<ApiResponse<BlacklistResponse>> getById(@PathVariable UUID id) {
         BlacklistResponse response = blacklistService.getById(id);
@@ -57,7 +57,7 @@ public class BlacklistController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'blacklist.update')")
     @Operation(summary = "Update a blacklist entry")
     public ResponseEntity<ApiResponse<BlacklistResponse>> update(
             @PathVariable UUID id,
@@ -67,7 +67,7 @@ public class BlacklistController {
     }
 
     @PostMapping("/{id}/deactivate")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'blacklist.delete')")
     @Operation(summary = "Deactivate a blacklist entry")
     public ResponseEntity<ApiResponse<Void>> deactivate(@PathVariable UUID id) {
         blacklistService.deactivate(id);
@@ -75,7 +75,7 @@ public class BlacklistController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'blacklist.delete')")
     @Operation(summary = "Delete a blacklist entry")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         blacklistService.delete(id);
@@ -83,7 +83,7 @@ public class BlacklistController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'blacklist.read')")
     @Operation(summary = "Search blacklist entries")
     public ResponseEntity<ApiResponse<PagedResponse<BlacklistResponse>>> search(
             @RequestParam String query,
@@ -93,7 +93,7 @@ public class BlacklistController {
     }
 
     @GetMapping("/check")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'blacklist.check')")
     @Operation(summary = "Check if a phone or plate number is blacklisted")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> check(
             @RequestParam(required = false) String phone,

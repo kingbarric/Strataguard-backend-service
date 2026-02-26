@@ -7,6 +7,7 @@ import com.strataguard.core.exception.DuplicateResourceException;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.util.ResidentMapper;
 import com.strataguard.core.config.TenantContext;
+import com.strataguard.infrastructure.repository.EstateRepository;
 import com.strataguard.infrastructure.repository.ResidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class ResidentService {
 
     private final ResidentRepository residentRepository;
+    private final EstateRepository estateRepository;
     private final ResidentMapper residentMapper;
 
     public ResidentResponse createResident(CreateResidentRequest request) {
@@ -106,6 +108,15 @@ public class ResidentService {
         Resident updated = residentRepository.save(resident);
         log.info("Linked Keycloak user {} to resident {} for tenant: {}", request.getUserId(), residentId, tenantId);
         return residentMapper.toResponse(updated);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<ResidentResponse> getResidentsByEstate(UUID estateId, Pageable pageable) {
+        UUID tenantId = TenantContext.requireTenantId();
+        estateRepository.findByIdAndTenantId(estateId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estate", "id", estateId));
+        Page<Resident> page = residentRepository.findByEstateIdAndTenantId(estateId, tenantId, pageable);
+        return toPagedResponse(page);
     }
 
     private PagedResponse<ResidentResponse> toPagedResponse(Page<Resident> page) {

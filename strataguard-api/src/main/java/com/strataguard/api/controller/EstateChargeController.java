@@ -28,7 +28,7 @@ public class EstateChargeController {
     private final EstateChargeService estateChargeService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.create')")
     @Operation(summary = "Create a new estate charge")
     public ResponseEntity<ApiResponse<EstateChargeResponse>> createEstateCharge(
             @Valid @RequestBody CreateEstateChargeRequest request) {
@@ -38,7 +38,7 @@ public class EstateChargeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get all estate charges with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<EstateChargeResponse>>> getAllEstateCharges(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -47,7 +47,7 @@ public class EstateChargeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get estate charge by ID")
     public ResponseEntity<ApiResponse<EstateChargeResponse>> getEstateCharge(@PathVariable UUID id) {
         EstateChargeResponse response = estateChargeService.getEstateCharge(id);
@@ -55,7 +55,7 @@ public class EstateChargeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.update')")
     @Operation(summary = "Update an estate charge")
     public ResponseEntity<ApiResponse<EstateChargeResponse>> updateEstateCharge(
             @PathVariable UUID id,
@@ -65,7 +65,7 @@ public class EstateChargeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.delete')")
     @Operation(summary = "Soft-delete an estate charge")
     public ResponseEntity<ApiResponse<Void>> deleteEstateCharge(@PathVariable UUID id) {
         estateChargeService.deleteEstateCharge(id);
@@ -73,7 +73,7 @@ public class EstateChargeController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get estate charges by estate")
     public ResponseEntity<ApiResponse<PagedResponse<EstateChargeResponse>>> getEstateChargesByEstate(
             @PathVariable UUID estateId,
@@ -83,7 +83,7 @@ public class EstateChargeController {
     }
 
     @PostMapping("/{id}/exclusions")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.exclusion_manage')")
     @Operation(summary = "Add a tenancy exclusion to an estate charge")
     public ResponseEntity<ApiResponse<ExclusionResponse>> addExclusion(
             @PathVariable UUID id,
@@ -94,7 +94,7 @@ public class EstateChargeController {
     }
 
     @DeleteMapping("/{id}/exclusions/{exclusionId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.exclusion_manage')")
     @Operation(summary = "Remove a tenancy exclusion from an estate charge")
     public ResponseEntity<ApiResponse<Void>> removeExclusion(
             @PathVariable UUID id,
@@ -104,7 +104,7 @@ public class EstateChargeController {
     }
 
     @GetMapping("/{id}/exclusions")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get all exclusions for an estate charge")
     public ResponseEntity<ApiResponse<List<ExclusionResponse>>> getExclusions(@PathVariable UUID id) {
         List<ExclusionResponse> response = estateChargeService.getExclusions(id);

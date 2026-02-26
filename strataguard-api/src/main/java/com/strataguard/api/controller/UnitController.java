@@ -29,7 +29,7 @@ public class UnitController {
     private final UnitService unitService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'unit.create')")
     @Operation(summary = "Create a new unit")
     public ResponseEntity<ApiResponse<UnitResponse>> createUnit(
             @Valid @RequestBody CreateUnitRequest request) {
@@ -39,6 +39,7 @@ public class UnitController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'unit.read')")
     @Operation(summary = "Get unit by ID")
     public ResponseEntity<ApiResponse<UnitResponse>> getUnit(@PathVariable UUID id) {
         UnitResponse response = unitService.getUnit(id);
@@ -46,6 +47,7 @@ public class UnitController {
     }
 
     @GetMapping("/estate/{estateId}")
+    @PreAuthorize("hasPermission(null, 'unit.read')")
     @Operation(summary = "Get all units for an estate")
     public ResponseEntity<ApiResponse<PagedResponse<UnitResponse>>> getUnitsByEstate(
             @PathVariable UUID estateId,
@@ -55,7 +57,7 @@ public class UnitController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'unit.update')")
     @Operation(summary = "Update a unit")
     public ResponseEntity<ApiResponse<UnitResponse>> updateUnit(
             @PathVariable UUID id,
@@ -65,7 +67,7 @@ public class UnitController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'unit.delete')")
     @Operation(summary = "Soft-delete a unit")
     public ResponseEntity<ApiResponse<Void>> deleteUnit(@PathVariable UUID id) {
         unitService.deleteUnit(id);
@@ -73,6 +75,7 @@ public class UnitController {
     }
 
     @GetMapping("/estate/{estateId}/count")
+    @PreAuthorize("hasPermission(null, 'unit.read')")
     @Operation(summary = "Count units in an estate")
     public ResponseEntity<ApiResponse<Long>> countUnits(@PathVariable UUID estateId) {
         long count = unitService.countUnitsByEstate(estateId);

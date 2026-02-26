@@ -21,7 +21,7 @@ public class ReportingController {
     private final ReportingService reportingService;
 
     @GetMapping("/occupancy")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'report.occupancy')")
     @Operation(summary = "Get occupancy report")
     public ResponseEntity<ApiResponse<OccupancyReportResponse>> getOccupancyReport() {
         OccupancyReportResponse response = reportingService.getOccupancyReport();
@@ -29,7 +29,7 @@ public class ReportingController {
     }
 
     @GetMapping("/revenue")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'report.financial')")
     @Operation(summary = "Get revenue report")
     public ResponseEntity<ApiResponse<RevenueReportResponse>> getRevenueReport() {
         RevenueReportResponse response = reportingService.getRevenueReport();
@@ -37,7 +37,7 @@ public class ReportingController {
     }
 
     @GetMapping("/visitor-traffic")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'SECURITY_GUARD', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'report.gate')")
     @Operation(summary = "Get visitor traffic report")
     public ResponseEntity<ApiResponse<VisitorTrafficReportResponse>> getVisitorTrafficReport() {
         VisitorTrafficReportResponse response = reportingService.getVisitorTrafficReport();
@@ -45,7 +45,7 @@ public class ReportingController {
     }
 
     @GetMapping("/security")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SECURITY_GUARD', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'report.security')")
     @Operation(summary = "Get security report")
     public ResponseEntity<ApiResponse<SecurityReportResponse>> getSecurityReport() {
         SecurityReportResponse response = reportingService.getSecurityReport();
@@ -53,7 +53,7 @@ public class ReportingController {
     }
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'report.occupancy')")
     @Operation(summary = "Get dashboard summary")
     public ResponseEntity<ApiResponse<DashboardSummaryResponse>> getDashboardSummary() {
         DashboardSummaryResponse response = reportingService.getDashboardSummary();

@@ -36,7 +36,7 @@ public class ArtisanController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.create')")
     @Operation(summary = "Register a new artisan")
     public ResponseEntity<ApiResponse<ArtisanResponse>> createArtisan(
             @Valid @RequestBody CreateArtisanRequest request) {
@@ -46,7 +46,7 @@ public class ArtisanController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.update')")
     @Operation(summary = "Update an artisan")
     public ResponseEntity<ApiResponse<ArtisanResponse>> updateArtisan(
             @PathVariable UUID id,
@@ -56,7 +56,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Get artisan by ID")
     public ResponseEntity<ApiResponse<ArtisanResponse>> getArtisan(@PathVariable UUID id) {
         ArtisanResponse response = artisanService.getArtisan(id);
@@ -64,7 +64,7 @@ public class ArtisanController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Get all artisans")
     public ResponseEntity<ApiResponse<PagedResponse<ArtisanResponse>>> getAllArtisans(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -73,7 +73,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Get artisans by estate")
     public ResponseEntity<ApiResponse<PagedResponse<ArtisanResponse>>> getArtisansByEstate(
             @PathVariable UUID estateId,
@@ -83,7 +83,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/category/{category}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Get artisans by category")
     public ResponseEntity<ApiResponse<PagedResponse<ArtisanResponse>>> getArtisansByCategory(
             @PathVariable ArtisanCategory category,
@@ -93,7 +93,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Search artisans")
     public ResponseEntity<ApiResponse<PagedResponse<ArtisanResponse>>> searchArtisans(
             @RequestParam String query,
@@ -103,7 +103,7 @@ public class ArtisanController {
     }
 
     @PostMapping("/{id}/verify")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'artisan.verify')")
     @Operation(summary = "Verify an artisan")
     public ResponseEntity<ApiResponse<ArtisanResponse>> verifyArtisan(@PathVariable UUID id) {
         ArtisanResponse response = artisanService.verifyArtisan(id);
@@ -111,7 +111,7 @@ public class ArtisanController {
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'artisan.verify')")
     @Operation(summary = "Update artisan status")
     public ResponseEntity<ApiResponse<ArtisanResponse>> updateStatus(
             @PathVariable UUID id,
@@ -121,7 +121,7 @@ public class ArtisanController {
     }
 
     @PostMapping("/{id}/rate")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'artisan.rate')")
     @Operation(summary = "Rate an artisan")
     public ResponseEntity<ApiResponse<ArtisanRatingResponse>> rateArtisan(
             @PathVariable UUID id,
@@ -134,7 +134,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/{id}/ratings")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'artisan.read')")
     @Operation(summary = "Get artisan ratings")
     public ResponseEntity<ApiResponse<PagedResponse<ArtisanRatingResponse>>> getArtisanRatings(
             @PathVariable UUID id,
@@ -144,7 +144,7 @@ public class ArtisanController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'artisan.delete')")
     @Operation(summary = "Delete an artisan")
     public ResponseEntity<ApiResponse<Void>> deleteArtisan(@PathVariable UUID id) {
         artisanService.deleteArtisan(id);

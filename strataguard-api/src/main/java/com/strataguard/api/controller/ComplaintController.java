@@ -35,7 +35,7 @@ public class ComplaintController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.create')")
     @Operation(summary = "Submit a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> createComplaint(
             @Valid @RequestBody CreateComplaintRequest request,
@@ -47,7 +47,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.read')")
     @Operation(summary = "Get complaint by ID")
     public ResponseEntity<ApiResponse<ComplaintResponse>> getComplaint(@PathVariable UUID id) {
         ComplaintResponse response = complaintService.getComplaint(id);
@@ -55,7 +55,7 @@ public class ComplaintController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.read')")
     @Operation(summary = "Get all complaints")
     public ResponseEntity<ApiResponse<PagedResponse<ComplaintResponse>>> getAllComplaints(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -64,7 +64,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.read')")
     @Operation(summary = "Get complaints by estate")
     public ResponseEntity<ApiResponse<PagedResponse<ComplaintResponse>>> getComplaintsByEstate(
             @PathVariable UUID estateId,
@@ -74,7 +74,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/my-complaints")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'complaint.read')")
     @Operation(summary = "Get my complaints")
     public ResponseEntity<ApiResponse<PagedResponse<ComplaintResponse>>> getMyComplaints(
             @AuthenticationPrincipal Jwt jwt,
@@ -85,7 +85,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.read')")
     @Operation(summary = "Get complaints by status")
     public ResponseEntity<ApiResponse<PagedResponse<ComplaintResponse>>> getComplaintsByStatus(
             @PathVariable ComplaintStatus status,
@@ -95,7 +95,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/{id}/acknowledge")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.update')")
     @Operation(summary = "Acknowledge a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> acknowledgeComplaint(@PathVariable UUID id) {
         ComplaintResponse response = complaintService.acknowledgeComplaint(id);
@@ -103,7 +103,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/{id}/assign")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.assign')")
     @Operation(summary = "Assign a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> assignComplaint(
             @PathVariable UUID id,
@@ -114,7 +114,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/{id}/resolve")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'complaint.update')")
     @Operation(summary = "Resolve a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> resolveComplaint(
             @PathVariable UUID id,
@@ -124,7 +124,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'complaint.close')")
     @Operation(summary = "Close a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> closeComplaint(@PathVariable UUID id) {
         ComplaintResponse response = complaintService.closeComplaint(id);
@@ -132,7 +132,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'complaint.escalate')")
     @Operation(summary = "Reject a complaint")
     public ResponseEntity<ApiResponse<ComplaintResponse>> rejectComplaint(
             @PathVariable UUID id,
@@ -142,7 +142,7 @@ public class ComplaintController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'complaint.close')")
     @Operation(summary = "Delete a complaint")
     public ResponseEntity<ApiResponse<Void>> deleteComplaint(@PathVariable UUID id) {
         complaintService.deleteComplaint(id);

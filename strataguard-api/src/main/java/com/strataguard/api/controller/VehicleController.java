@@ -33,7 +33,7 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'vehicle.create')")
     @Operation(summary = "Register a new vehicle")
     public ResponseEntity<ApiResponse<VehicleResponse>> createVehicle(
             @Valid @RequestBody CreateVehicleRequest request) {
@@ -43,6 +43,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'vehicle.read')")
     @Operation(summary = "Get vehicle by ID")
     public ResponseEntity<ApiResponse<VehicleResponse>> getVehicle(@PathVariable UUID id) {
         VehicleResponse response = vehicleService.getVehicle(id);
@@ -50,6 +51,7 @@ public class VehicleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission(null, 'vehicle.read')")
     @Operation(summary = "Get all vehicles with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<VehicleResponse>>> getAllVehicles(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -58,6 +60,7 @@ public class VehicleController {
     }
 
     @GetMapping("/resident/{residentId}")
+    @PreAuthorize("hasPermission(null, 'vehicle.read')")
     @Operation(summary = "Get all vehicles for a resident")
     public ResponseEntity<ApiResponse<PagedResponse<VehicleResponse>>> getVehiclesByResident(
             @PathVariable UUID residentId,
@@ -67,6 +70,7 @@ public class VehicleController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasPermission(null, 'vehicle.read')")
     @Operation(summary = "Search vehicles by plate number, make, model, or color")
     public ResponseEntity<ApiResponse<PagedResponse<VehicleResponse>>> searchVehicles(
             @RequestParam String query,
@@ -76,7 +80,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'vehicle.update')")
     @Operation(summary = "Update a vehicle")
     public ResponseEntity<ApiResponse<VehicleResponse>> updateVehicle(
             @PathVariable UUID id,
@@ -86,7 +90,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'vehicle.delete')")
     @Operation(summary = "Soft-delete a vehicle")
     public ResponseEntity<ApiResponse<Void>> deleteVehicle(@PathVariable UUID id) {
         vehicleService.deleteVehicle(id);
@@ -94,7 +98,7 @@ public class VehicleController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'vehicle.import')")
     @Operation(summary = "Bulk import vehicles from CSV")
     public ResponseEntity<ApiResponse<BulkImportResponse>> bulkImport(
             @RequestParam("file") MultipartFile file) throws IOException {

@@ -39,7 +39,7 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/conversations")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'chat.send')")
     @Operation(summary = "Create a new conversation")
     public ResponseEntity<ApiResponse<ConversationResponse>> createConversation(
             @Valid @RequestBody CreateConversationRequest request,
@@ -51,6 +51,7 @@ public class ChatController {
     }
 
     @GetMapping("/conversations")
+    @PreAuthorize("hasPermission(null, 'chat.read')")
     @Operation(summary = "Get my conversations")
     public ResponseEntity<ApiResponse<PagedResponse<ConversationResponse>>> getMyConversations(
             @PageableDefault(size = 20) Pageable pageable,
@@ -61,6 +62,7 @@ public class ChatController {
     }
 
     @GetMapping("/conversations/{id}")
+    @PreAuthorize("hasPermission(null, 'chat.read')")
     @Operation(summary = "Get conversation details")
     public ResponseEntity<ApiResponse<ConversationResponse>> getConversation(
             @PathVariable UUID id,
@@ -71,6 +73,7 @@ public class ChatController {
     }
 
     @GetMapping("/conversations/{id}/messages")
+    @PreAuthorize("hasPermission(null, 'chat.read')")
     @Operation(summary = "Get message history for a conversation")
     public ResponseEntity<ApiResponse<PagedResponse<ChatMessageResponse>>> getMessageHistory(
             @PathVariable UUID id,
@@ -82,6 +85,7 @@ public class ChatController {
     }
 
     @PostMapping("/conversations/{id}/messages")
+    @PreAuthorize("hasPermission(null, 'chat.send')")
     @Operation(summary = "Send a message to a conversation")
     public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(
             @PathVariable UUID id,
@@ -102,6 +106,7 @@ public class ChatController {
     }
 
     @PutMapping("/conversations/{id}/read")
+    @PreAuthorize("hasPermission(null, 'chat.read')")
     @Operation(summary = "Mark conversation as read")
     public ResponseEntity<ApiResponse<Void>> markAsRead(
             @PathVariable UUID id,
@@ -112,6 +117,7 @@ public class ChatController {
     }
 
     @GetMapping("/unread-count")
+    @PreAuthorize("hasPermission(null, 'chat.read')")
     @Operation(summary = "Get total unread chat message count")
     public ResponseEntity<ApiResponse<UnreadChatCountResponse>> getUnreadCount(
             @AuthenticationPrincipal Jwt jwt) {

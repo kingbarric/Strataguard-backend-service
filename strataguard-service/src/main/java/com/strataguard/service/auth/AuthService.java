@@ -1,8 +1,11 @@
 package com.strataguard.service.auth;
 
 import com.strataguard.core.dto.auth.*;
+import com.strataguard.core.dto.membership.CreateMembershipRequest;
+import com.strataguard.core.dto.membership.EstateMembershipResponse;
 import com.strataguard.core.enums.UserRole;
 import com.strataguard.service.keycloak.KeycloakUserService;
+import com.strataguard.service.membership.EstateMembershipService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final KeycloakUserService keycloakUserService;
+    private final EstateMembershipService membershipService;
     private final ObjectMapper objectMapper;
 
     @Value("${keycloak.admin.server-url}")
@@ -42,7 +46,10 @@ public class AuthService {
     public RegisterResponse register(RegisterRequest request) {
         validateRole(request.getRole());
 
-        String tenantId = UUID.randomUUID().toString();
+        // Use provided tenantId (join existing tenant) or generate a new one
+        String tenantId = request.getTenantId() != null
+                ? request.getTenantId().toString()
+                : UUID.randomUUID().toString();
 
         String userId = keycloakUserService.createUser(
                 request.getEmail(),
@@ -55,11 +62,24 @@ public class AuthService {
 
         log.info("Registered user: {} with role: {} and tenant: {}", request.getEmail(), request.getRole(), tenantId);
 
+        // Auto-create estate membership if estateId is provided
+        EstateMembershipResponse membership = null;
+        if (request.getEstateId() != null) {
+            CreateMembershipRequest membershipRequest = CreateMembershipRequest.builder()
+                    .userId(userId)
+                    .estateId(request.getEstateId())
+                    .role(request.getRole())
+                    .build();
+            membership = membershipService.createMembership(membershipRequest);
+            log.info("Auto-created membership for user {} in estate {}", userId, request.getEstateId());
+        }
+
         return RegisterResponse.builder()
                 .userId(userId)
                 .email(request.getEmail())
                 .role(request.getRole())
                 .tenantId(tenantId)
+                .membership(membership)
                 .build();
     }
 
@@ -119,7 +139,9 @@ public class AuthService {
             UserRole.valueOf(role);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid role: " + role
-                    + ". Valid roles: SUPER_ADMIN, ESTATE_ADMIN, FACILITY_MANAGER, RESIDENT, SECURITY_GUARD");
+                    + ". Valid roles: SUPER_ADMIN, PORTFOLIO_ADMIN, PORTFOLIO_VIEWER, ESTATE_ADMIN, "
+                    + "FINANCE_OFFICER, SECURITY_MANAGER, SECURITY_GUARD, FACILITY_MANAGER, "
+                    + "FRONT_DESK, RESIDENT_PRIMARY, RESIDENT_DEPENDENT");
         }
     }
 

@@ -3,6 +3,8 @@ package com.strataguard.core.entity;
 import com.strataguard.core.enums.EstateType;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -53,4 +55,7 @@ public class Estate extends BaseEntity {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(name = "portfolio_id")
+    private UUID portfolioId;
 }

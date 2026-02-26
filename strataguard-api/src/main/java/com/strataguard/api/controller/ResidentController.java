@@ -32,7 +32,7 @@ public class ResidentController {
     private final ResidentService residentService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'resident.create')")
     @Operation(summary = "Create a new resident")
     public ResponseEntity<ApiResponse<ResidentResponse>> createResident(
             @Valid @RequestBody CreateResidentRequest request) {
@@ -42,6 +42,7 @@ public class ResidentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'resident.read')")
     @Operation(summary = "Get resident by ID")
     public ResponseEntity<ApiResponse<ResidentResponse>> getResident(@PathVariable UUID id) {
         ResidentResponse response = residentService.getResident(id);
@@ -49,6 +50,7 @@ public class ResidentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission(null, 'resident.read')")
     @Operation(summary = "Get all residents with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<ResidentResponse>>> getAllResidents(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -56,7 +58,18 @@ public class ResidentController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/estate/{estateId}")
+    @PreAuthorize("hasPermission(null, 'resident.read')")
+    @Operation(summary = "Get all residents for an estate")
+    public ResponseEntity<ApiResponse<PagedResponse<ResidentResponse>>> getResidentsByEstate(
+            @PathVariable UUID estateId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        PagedResponse<ResidentResponse> response = residentService.getResidentsByEstate(estateId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @GetMapping("/search")
+    @PreAuthorize("hasPermission(null, 'resident.read')")
     @Operation(summary = "Search residents by name, email, or phone")
     public ResponseEntity<ApiResponse<PagedResponse<ResidentResponse>>> searchResidents(
             @RequestParam String query,
@@ -75,7 +88,7 @@ public class ResidentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'resident.update')")
     @Operation(summary = "Update a resident")
     public ResponseEntity<ApiResponse<ResidentResponse>> updateResident(
             @PathVariable UUID id,
@@ -85,7 +98,7 @@ public class ResidentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'resident.delete')")
     @Operation(summary = "Soft-delete a resident")
     public ResponseEntity<ApiResponse<Void>> deleteResident(@PathVariable UUID id) {
         residentService.deleteResident(id);
@@ -93,7 +106,7 @@ public class ResidentController {
     }
 
     @PostMapping("/{id}/link-user")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'resident.link_user')")
     @Operation(summary = "Link a Keycloak user to a resident profile")
     public ResponseEntity<ApiResponse<ResidentResponse>> linkKeycloakUser(
             @PathVariable UUID id,

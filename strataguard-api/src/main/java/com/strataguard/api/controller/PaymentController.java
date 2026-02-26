@@ -35,7 +35,7 @@ public class PaymentController {
     private final ResidentRepository residentRepository;
 
     @PostMapping("/initialize")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'payment.initiate')")
     @Operation(summary = "Initialize a Paystack payment")
     public ResponseEntity<ApiResponse<InitiatePaymentResponse>> initializePayment(
             @Valid @RequestBody InitiatePaymentRequest request,
@@ -47,7 +47,7 @@ public class PaymentController {
     }
 
     @PostMapping("/record")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'payment.initiate')")
     @Operation(summary = "Record a manual/cash payment")
     public ResponseEntity<ApiResponse<PaymentResponse>> recordPayment(
             @Valid @RequestBody RecordPaymentRequest request) {
@@ -66,7 +66,7 @@ public class PaymentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'payment.read')")
     @Operation(summary = "Get all payments with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<PaymentResponse>>> getAllPayments(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -75,7 +75,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'payment.read')")
     @Operation(summary = "Get payment by ID")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(@PathVariable UUID id) {
         PaymentResponse response = paymentService.getPayment(id);
@@ -83,7 +83,7 @@ public class PaymentController {
     }
 
     @GetMapping("/invoice/{invoiceId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'payment.read')")
     @Operation(summary = "Get payments for an invoice")
     public ResponseEntity<ApiResponse<PagedResponse<PaymentResponse>>> getPaymentsByInvoice(
             @PathVariable UUID invoiceId,
@@ -93,7 +93,7 @@ public class PaymentController {
     }
 
     @GetMapping("/verify/{reference}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'payment.read')")
     @Operation(summary = "Verify a payment by reference")
     public ResponseEntity<ApiResponse<PaymentResponse>> verifyPayment(@PathVariable String reference) {
         PaymentResponse response = paymentService.verifyPayment(reference);
@@ -101,7 +101,7 @@ public class PaymentController {
     }
 
     @GetMapping("/my-payments")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'payment.read')")
     @Operation(summary = "Get current resident's payments")
     public ResponseEntity<ApiResponse<PagedResponse<PaymentResponse>>> getMyPayments(
             @AuthenticationPrincipal Jwt jwt,
@@ -114,7 +114,7 @@ public class PaymentController {
     }
 
     @GetMapping("/wallet")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'wallet.read')")
     @Operation(summary = "Get current resident's wallet")
     public ResponseEntity<ApiResponse<WalletResponse>> getMyWallet(
             @AuthenticationPrincipal Jwt jwt) {
@@ -124,7 +124,7 @@ public class PaymentController {
     }
 
     @GetMapping("/wallet/transactions")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'wallet.read')")
     @Operation(summary = "Get current resident's wallet transactions")
     public ResponseEntity<ApiResponse<PagedResponse<WalletTransactionResponse>>> getMyWalletTransactions(
             @AuthenticationPrincipal Jwt jwt,
@@ -135,7 +135,7 @@ public class PaymentController {
     }
 
     @PostMapping("/wallet/apply")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'wallet.fund')")
     @Operation(summary = "Apply wallet balance to an invoice")
     public ResponseEntity<ApiResponse<Void>> applyWalletToInvoice(
             @RequestParam UUID invoiceId,

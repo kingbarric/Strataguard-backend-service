@@ -1,6 +1,7 @@
 package com.strataguard.core.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.strataguard.core.dto.membership.EstateMembershipResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,6 @@ public class RegisterResponse {
 
     @JsonProperty("tenant_id")
     private String tenantId;
+
+    private EstateMembershipResponse membership;
 }

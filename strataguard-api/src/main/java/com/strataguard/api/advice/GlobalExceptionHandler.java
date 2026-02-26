@@ -11,6 +11,8 @@ import com.strataguard.core.exception.PaymentProcessingException;
 import com.strataguard.core.exception.ResourceNotFoundException;
 import com.strataguard.core.exception.TenantMismatchException;
 import com.strataguard.core.exception.UnauthorizedException;
+import com.strataguard.core.exception.EstateMembershipException;
+import com.strataguard.core.exception.InsufficientPermissionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,6 +115,20 @@ public class GlobalExceptionHandler {
         log.error("Payment processing error: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(EstateMembershipException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMembershipException(EstateMembershipException ex) {
+        log.warn("Membership error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InsufficientPermissionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInsufficientPermission(InsufficientPermissionException ex) {
+        log.warn("Insufficient permission: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("Access denied: " + ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)

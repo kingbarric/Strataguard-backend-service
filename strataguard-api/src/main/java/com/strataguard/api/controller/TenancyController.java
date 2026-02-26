@@ -29,7 +29,7 @@ public class TenancyController {
     private final TenancyService tenancyService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'tenancy.create')")
     @Operation(summary = "Create a new tenancy (move-in)")
     public ResponseEntity<ApiResponse<TenancyResponse>> createTenancy(
             @Valid @RequestBody CreateTenancyRequest request) {
@@ -39,6 +39,7 @@ public class TenancyController {
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission(null, 'tenancy.read')")
     @Operation(summary = "Get all tenancies")
     public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getAllTenancies(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -47,6 +48,7 @@ public class TenancyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'tenancy.read')")
     @Operation(summary = "Get tenancy by ID")
     public ResponseEntity<ApiResponse<TenancyResponse>> getTenancy(@PathVariable UUID id) {
         TenancyResponse response = tenancyService.getTenancy(id);
@@ -54,6 +56,7 @@ public class TenancyController {
     }
 
     @GetMapping("/estate/{estateId}")
+    @PreAuthorize("hasPermission(null, 'tenancy.read')")
     @Operation(summary = "Get all tenancies for an estate")
     public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getTenanciesByEstate(
             @PathVariable UUID estateId,
@@ -63,6 +66,7 @@ public class TenancyController {
     }
 
     @GetMapping("/resident/{residentId}")
+    @PreAuthorize("hasPermission(null, 'tenancy.read')")
     @Operation(summary = "Get all tenancies for a resident")
     public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getTenanciesByResident(
             @PathVariable UUID residentId,
@@ -72,6 +76,7 @@ public class TenancyController {
     }
 
     @GetMapping("/unit/{unitId}")
+    @PreAuthorize("hasPermission(null, 'tenancy.read')")
     @Operation(summary = "Get all tenancies for a unit")
     public ResponseEntity<ApiResponse<PagedResponse<TenancyResponse>>> getTenanciesByUnit(
             @PathVariable UUID unitId,
@@ -81,7 +86,7 @@ public class TenancyController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'tenancy.update')")
     @Operation(summary = "Update a tenancy")
     public ResponseEntity<ApiResponse<TenancyResponse>> updateTenancy(
             @PathVariable UUID id,
@@ -91,7 +96,7 @@ public class TenancyController {
     }
 
     @PostMapping("/{id}/terminate")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'tenancy.terminate')")
     @Operation(summary = "Terminate a tenancy (move-out)")
     public ResponseEntity<ApiResponse<TenancyResponse>> terminateTenancy(@PathVariable UUID id) {
         TenancyResponse response = tenancyService.terminateTenancy(id);
@@ -99,7 +104,7 @@ public class TenancyController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'tenancy.terminate')")
     @Operation(summary = "Soft-delete a tenancy")
     public ResponseEntity<ApiResponse<Void>> deleteTenancy(@PathVariable UUID id) {
         tenancyService.deleteTenancy(id);

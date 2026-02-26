@@ -34,7 +34,7 @@ public class InvoiceController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.create')")
     @Operation(summary = "Create a single invoice")
     public ResponseEntity<ApiResponse<InvoiceResponse>> createInvoice(
             @Valid @RequestBody CreateInvoiceRequest request) {
@@ -44,7 +44,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.create')")
     @Operation(summary = "Bulk generate invoices for all active tenancies")
     public ResponseEntity<ApiResponse<List<InvoiceResponse>>> bulkGenerateInvoices(
             @Valid @RequestBody BulkInvoiceRequest request) {
@@ -54,7 +54,7 @@ public class InvoiceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Get all invoices with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<InvoiceResponse>>> getAllInvoices(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -63,7 +63,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Get invoice by ID")
     public ResponseEntity<ApiResponse<InvoiceResponse>> getInvoice(@PathVariable UUID id) {
         InvoiceResponse response = invoiceService.getInvoice(id);
@@ -71,7 +71,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/my-invoices")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Get current resident's invoices")
     public ResponseEntity<ApiResponse<PagedResponse<InvoiceResponse>>> getMyInvoices(
             @AuthenticationPrincipal Jwt jwt,
@@ -82,7 +82,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/unit/{unitId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Get invoices by unit")
     public ResponseEntity<ApiResponse<PagedResponse<InvoiceResponse>>> getInvoicesByUnit(
             @PathVariable UUID unitId,
@@ -92,7 +92,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/summary")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.summary')")
     @Operation(summary = "Get invoice summary statistics")
     public ResponseEntity<ApiResponse<InvoiceSummaryResponse>> getInvoiceSummary() {
         InvoiceSummaryResponse response = invoiceService.getInvoiceSummary();
@@ -100,7 +100,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/overdue")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Get overdue invoices")
     public ResponseEntity<ApiResponse<PagedResponse<InvoiceResponse>>> getOverdueInvoices(
             @PageableDefault(size = 20, sort = "dueDate", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -109,7 +109,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.void')")
     @Operation(summary = "Cancel an invoice")
     public ResponseEntity<ApiResponse<InvoiceResponse>> cancelInvoice(@PathVariable UUID id) {
         InvoiceResponse response = invoiceService.cancelInvoice(id);
@@ -117,7 +117,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/apply-penalties")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.update')")
     @Operation(summary = "Apply penalties to overdue invoices")
     public ResponseEntity<ApiResponse<Integer>> applyPenalties() {
         int count = invoiceService.applyPenalties();
@@ -125,7 +125,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'invoice.read')")
     @Operation(summary = "Search invoices")
     public ResponseEntity<ApiResponse<PagedResponse<InvoiceResponse>>> searchInvoices(
             @RequestParam String query,

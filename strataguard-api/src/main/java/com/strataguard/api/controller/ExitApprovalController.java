@@ -25,7 +25,7 @@ public class ExitApprovalController {
     private final ExitApprovalService exitApprovalService;
 
     @PostMapping
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'exit_approval.create')")
     @Operation(summary = "Create an exit approval request for remote authorization")
     public ResponseEntity<ApiResponse<ExitApprovalResponse>> createApprovalRequest(
             @Valid @RequestBody CreateExitApprovalRequest request) {
@@ -35,6 +35,7 @@ public class ExitApprovalController {
     }
 
     @GetMapping("/pending")
+    @PreAuthorize("hasPermission(null, 'exit_approval.manage')")
     @Operation(summary = "Get pending approval requests for the authenticated resident")
     public ResponseEntity<ApiResponse<List<ExitApprovalResponse>>> getPendingApprovals(
             @RequestParam UUID residentId) {
@@ -43,6 +44,7 @@ public class ExitApprovalController {
     }
 
     @PostMapping("/{id}/approve")
+    @PreAuthorize("hasPermission(null, 'exit_approval.manage')")
     @Operation(summary = "Approve an exit approval request")
     public ResponseEntity<ApiResponse<ExitApprovalResponse>> approveRequest(@PathVariable UUID id) {
         ExitApprovalResponse response = exitApprovalService.approveRequest(id);
@@ -50,6 +52,7 @@ public class ExitApprovalController {
     }
 
     @PostMapping("/{id}/deny")
+    @PreAuthorize("hasPermission(null, 'exit_approval.manage')")
     @Operation(summary = "Deny an exit approval request")
     public ResponseEntity<ApiResponse<ExitApprovalResponse>> denyRequest(@PathVariable UUID id) {
         ExitApprovalResponse response = exitApprovalService.denyRequest(id);
@@ -57,7 +60,7 @@ public class ExitApprovalController {
     }
 
     @GetMapping("/{id}/status")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'exit_approval.manage')")
     @Operation(summary = "Check the status of an exit approval request")
     public ResponseEntity<ApiResponse<ExitApprovalResponse>> getApprovalStatus(@PathVariable UUID id) {
         ExitApprovalResponse response = exitApprovalService.getApprovalStatus(id);

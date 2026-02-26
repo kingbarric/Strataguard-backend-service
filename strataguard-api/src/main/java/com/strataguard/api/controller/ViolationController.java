@@ -31,7 +31,7 @@ public class ViolationController {
     private final ViolationService violationService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'violation.create')")
     @Operation(summary = "Report a violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> createViolation(
             @Valid @RequestBody CreateViolationRequest request,
@@ -44,7 +44,7 @@ public class ViolationController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'violation.read')")
     @Operation(summary = "Get violation by ID")
     public ResponseEntity<ApiResponse<ViolationResponse>> getViolation(@PathVariable UUID id) {
         ViolationResponse response = violationService.getViolation(id);
@@ -52,7 +52,7 @@ public class ViolationController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'violation.read')")
     @Operation(summary = "Get all violations")
     public ResponseEntity<ApiResponse<PagedResponse<ViolationResponse>>> getAllViolations(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -61,7 +61,7 @@ public class ViolationController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'violation.read')")
     @Operation(summary = "Get violations by estate")
     public ResponseEntity<ApiResponse<PagedResponse<ViolationResponse>>> getViolationsByEstate(
             @PathVariable UUID estateId,
@@ -71,7 +71,7 @@ public class ViolationController {
     }
 
     @GetMapping("/unit/{unitId}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'violation.read')")
     @Operation(summary = "Get violations by unit")
     public ResponseEntity<ApiResponse<PagedResponse<ViolationResponse>>> getViolationsByUnit(
             @PathVariable UUID unitId,
@@ -81,7 +81,7 @@ public class ViolationController {
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'violation.read')")
     @Operation(summary = "Get violations by status")
     public ResponseEntity<ApiResponse<PagedResponse<ViolationResponse>>> getViolationsByStatus(
             @PathVariable ViolationStatus status,
@@ -91,7 +91,7 @@ public class ViolationController {
     }
 
     @PostMapping("/{id}/confirm")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'violation.update')")
     @Operation(summary = "Confirm a violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> confirmViolation(
             @PathVariable UUID id,
@@ -101,7 +101,7 @@ public class ViolationController {
     }
 
     @PostMapping("/{id}/fine")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'violation.update')")
     @Operation(summary = "Issue fine for violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> issueFine(@PathVariable UUID id) {
         ViolationResponse response = violationService.issueFinance(id);
@@ -109,7 +109,7 @@ public class ViolationController {
     }
 
     @PostMapping("/{id}/appeal")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'violation.appeal')")
     @Operation(summary = "Appeal a violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> appealViolation(
             @PathVariable UUID id,
@@ -119,7 +119,7 @@ public class ViolationController {
     }
 
     @PostMapping("/{id}/dismiss")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'violation.appeal_review')")
     @Operation(summary = "Dismiss a violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> dismissViolation(
             @PathVariable UUID id,
@@ -129,7 +129,7 @@ public class ViolationController {
     }
 
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'violation.close')")
     @Operation(summary = "Close a violation")
     public ResponseEntity<ApiResponse<ViolationResponse>> closeViolation(
             @PathVariable UUID id,

@@ -33,7 +33,7 @@ public class NotificationController {
     private final ResidentRepository residentRepository;
 
     @GetMapping("/my-notifications")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.read')")
     @Operation(summary = "Get current resident's notifications")
     public ResponseEntity<ApiResponse<PagedResponse<NotificationResponse>>> getMyNotifications(
             @AuthenticationPrincipal Jwt jwt,
@@ -44,7 +44,7 @@ public class NotificationController {
     }
 
     @GetMapping("/unread-count")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.read')")
     @Operation(summary = "Get unread notification count")
     public ResponseEntity<ApiResponse<UnreadCountResponse>> getUnreadCount(
             @AuthenticationPrincipal Jwt jwt) {
@@ -54,7 +54,7 @@ public class NotificationController {
     }
 
     @PostMapping("/{id}/read")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.read')")
     @Operation(summary = "Mark a notification as read")
     public ResponseEntity<ApiResponse<NotificationResponse>> markAsRead(
             @PathVariable UUID id,
@@ -65,7 +65,7 @@ public class NotificationController {
     }
 
     @PostMapping("/read-all")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'notification.read')")
     @Operation(summary = "Mark all notifications as read")
     public ResponseEntity<ApiResponse<Void>> markAllAsRead(
             @AuthenticationPrincipal Jwt jwt) {
@@ -75,7 +75,7 @@ public class NotificationController {
     }
 
     @PostMapping("/send")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.send')")
     @Operation(summary = "Send notification to specific resident(s)")
     public ResponseEntity<ApiResponse<Void>> sendNotification(
             @Valid @RequestBody SendNotificationRequest request) {
@@ -85,7 +85,7 @@ public class NotificationController {
     }
 
     @PostMapping("/send-bulk")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.send')")
     @Operation(summary = "Send notification to all residents in an estate")
     public ResponseEntity<ApiResponse<Void>> sendBulkNotification(
             @Valid @RequestBody BulkNotificationRequest request) {

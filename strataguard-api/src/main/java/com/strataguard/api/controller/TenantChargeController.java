@@ -27,7 +27,7 @@ public class TenantChargeController {
     private final TenantChargeService tenantChargeService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.create')")
     @Operation(summary = "Create a new tenant charge")
     public ResponseEntity<ApiResponse<TenantChargeResponse>> createTenantCharge(
             @Valid @RequestBody CreateTenantChargeRequest request) {
@@ -37,7 +37,7 @@ public class TenantChargeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get all tenant charges with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<TenantChargeResponse>>> getAllTenantCharges(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -46,7 +46,7 @@ public class TenantChargeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get tenant charge by ID")
     public ResponseEntity<ApiResponse<TenantChargeResponse>> getTenantCharge(@PathVariable UUID id) {
         TenantChargeResponse response = tenantChargeService.getTenantCharge(id);
@@ -54,7 +54,7 @@ public class TenantChargeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.update')")
     @Operation(summary = "Update a tenant charge")
     public ResponseEntity<ApiResponse<TenantChargeResponse>> updateTenantCharge(
             @PathVariable UUID id,
@@ -64,7 +64,7 @@ public class TenantChargeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'charge.delete')")
     @Operation(summary = "Soft-delete a tenant charge")
     public ResponseEntity<ApiResponse<Void>> deleteTenantCharge(@PathVariable UUID id) {
         tenantChargeService.deleteTenantCharge(id);
@@ -72,7 +72,7 @@ public class TenantChargeController {
     }
 
     @GetMapping("/tenancy/{tenancyId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get tenant charges by tenancy")
     public ResponseEntity<ApiResponse<PagedResponse<TenantChargeResponse>>> getTenantChargesByTenancy(
             @PathVariable UUID tenancyId,
@@ -82,7 +82,7 @@ public class TenantChargeController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'charge.read')")
     @Operation(summary = "Get tenant charges by estate")
     public ResponseEntity<ApiResponse<PagedResponse<TenantChargeResponse>>> getTenantChargesByEstate(
             @PathVariable UUID estateId,

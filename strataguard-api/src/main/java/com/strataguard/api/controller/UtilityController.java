@@ -35,7 +35,7 @@ public class UtilityController {
     // --- Meters ---
 
     @PostMapping("/meters")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_manage')")
     @Operation(summary = "Create a utility meter")
     public ResponseEntity<ApiResponse<UtilityMeterResponse>> createMeter(
             @Valid @RequestBody CreateUtilityMeterRequest request) {
@@ -45,7 +45,7 @@ public class UtilityController {
     }
 
     @PutMapping("/meters/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_manage')")
     @Operation(summary = "Update a utility meter")
     public ResponseEntity<ApiResponse<UtilityMeterResponse>> updateMeter(
             @PathVariable UUID id,
@@ -55,7 +55,7 @@ public class UtilityController {
     }
 
     @GetMapping("/meters")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_read')")
     @Operation(summary = "Get all utility meters")
     public ResponseEntity<ApiResponse<PagedResponse<UtilityMeterResponse>>> getAllMeters(
             @PageableDefault(size = 20) Pageable pageable) {
@@ -64,7 +64,7 @@ public class UtilityController {
     }
 
     @GetMapping("/meters/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_read')")
     @Operation(summary = "Get utility meter by ID")
     public ResponseEntity<ApiResponse<UtilityMeterResponse>> getMeter(@PathVariable UUID id) {
         UtilityMeterResponse response = utilityService.getMeter(id);
@@ -72,7 +72,7 @@ public class UtilityController {
     }
 
     @GetMapping("/meters/unit/{unitId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_read')")
     @Operation(summary = "Get meters by unit")
     public ResponseEntity<ApiResponse<PagedResponse<UtilityMeterResponse>>> getMetersByUnit(
             @PathVariable UUID unitId,
@@ -82,7 +82,7 @@ public class UtilityController {
     }
 
     @GetMapping("/meters/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_read')")
     @Operation(summary = "Get meters by estate")
     public ResponseEntity<ApiResponse<PagedResponse<UtilityMeterResponse>>> getMetersByEstate(
             @PathVariable UUID estateId,
@@ -94,7 +94,7 @@ public class UtilityController {
     // --- Readings ---
 
     @PostMapping("/readings")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_create')")
     @Operation(summary = "Record a utility reading")
     public ResponseEntity<ApiResponse<UtilityReadingResponse>> recordReading(
             @Valid @RequestBody RecordReadingRequest request) {
@@ -104,7 +104,7 @@ public class UtilityController {
     }
 
     @PostMapping("/readings/{id}/validate")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_create')")
     @Operation(summary = "Validate a utility reading")
     public ResponseEntity<ApiResponse<UtilityReadingResponse>> validateReading(@PathVariable UUID id) {
         UtilityReadingResponse response = utilityService.validateReading(id);
@@ -112,7 +112,7 @@ public class UtilityController {
     }
 
     @GetMapping("/readings/meter/{meterId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_read')")
     @Operation(summary = "Get readings by meter")
     public ResponseEntity<ApiResponse<PagedResponse<UtilityReadingResponse>>> getReadingsByMeter(
             @PathVariable UUID meterId,
@@ -122,7 +122,7 @@ public class UtilityController {
     }
 
     @GetMapping("/readings/unit/{unitId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_read')")
     @Operation(summary = "Get readings by unit and period")
     public ResponseEntity<ApiResponse<List<UtilityReadingResponse>>> getReadingsByUnit(
             @PathVariable UUID unitId,
@@ -133,7 +133,7 @@ public class UtilityController {
     }
 
     @GetMapping("/meters/{meterId}/trend")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_read')")
     @Operation(summary = "Get consumption trend for a meter")
     public ResponseEntity<ApiResponse<ConsumptionTrendResponse>> getConsumptionTrend(
             @PathVariable UUID meterId,
@@ -143,7 +143,7 @@ public class UtilityController {
     }
 
     @GetMapping("/statements/unit/{unitId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER', 'RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'utility.reading_read')")
     @Operation(summary = "Get utility statement for a unit")
     public ResponseEntity<ApiResponse<UtilityStatementResponse>> getUtilityStatement(
             @PathVariable UUID unitId,
@@ -154,7 +154,7 @@ public class UtilityController {
     }
 
     @PostMapping("/readings/generate-invoices")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'utility.cost_manage')")
     @Operation(summary = "Generate invoices from validated readings")
     public ResponseEntity<ApiResponse<Map<String, Integer>>> generateInvoices() {
         int count = utilityService.generateInvoicesFromReadings();
@@ -164,7 +164,7 @@ public class UtilityController {
     // --- Shared Costs ---
 
     @PostMapping("/shared-costs")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'utility.cost_manage')")
     @Operation(summary = "Create a shared utility cost")
     public ResponseEntity<ApiResponse<SharedUtilityCostResponse>> createSharedCost(
             @Valid @RequestBody CreateSharedUtilityCostRequest request) {
@@ -174,7 +174,7 @@ public class UtilityController {
     }
 
     @GetMapping("/shared-costs/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.cost_manage')")
     @Operation(summary = "Get shared utility cost by ID")
     public ResponseEntity<ApiResponse<SharedUtilityCostResponse>> getSharedCost(@PathVariable UUID id) {
         SharedUtilityCostResponse response = sharedUtilityCostService.getSharedCost(id);
@@ -182,7 +182,7 @@ public class UtilityController {
     }
 
     @GetMapping("/shared-costs/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.cost_manage')")
     @Operation(summary = "Get shared costs by estate")
     public ResponseEntity<ApiResponse<PagedResponse<SharedUtilityCostResponse>>> getSharedCostsByEstate(
             @PathVariable UUID estateId,
@@ -192,7 +192,7 @@ public class UtilityController {
     }
 
     @PostMapping("/shared-costs/{id}/generate-invoices")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'utility.cost_manage')")
     @Operation(summary = "Generate invoices for a shared cost")
     public ResponseEntity<ApiResponse<Map<String, Integer>>> generateSharedCostInvoices(@PathVariable UUID id) {
         int count = sharedUtilityCostService.generateInvoicesForSharedCost(id);
@@ -200,7 +200,7 @@ public class UtilityController {
     }
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'utility.meter_read')")
     @Operation(summary = "Get utility dashboard")
     public ResponseEntity<ApiResponse<UtilityDashboardResponse>> getDashboard() {
         UtilityDashboardResponse response = utilityService.getDashboard();

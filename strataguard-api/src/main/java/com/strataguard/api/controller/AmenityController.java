@@ -28,7 +28,7 @@ public class AmenityController {
     private final AmenityService amenityService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'amenity.create')")
     @Operation(summary = "Create a new amenity")
     public ResponseEntity<ApiResponse<AmenityResponse>> createAmenity(
             @Valid @RequestBody CreateAmenityRequest request) {
@@ -38,7 +38,7 @@ public class AmenityController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'amenity.update')")
     @Operation(summary = "Update an amenity")
     public ResponseEntity<ApiResponse<AmenityResponse>> updateAmenity(
             @PathVariable UUID id,
@@ -48,7 +48,7 @@ public class AmenityController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'amenity.read')")
     @Operation(summary = "Get amenity by ID")
     public ResponseEntity<ApiResponse<AmenityResponse>> getAmenity(@PathVariable UUID id) {
         AmenityResponse response = amenityService.getAmenity(id);
@@ -56,7 +56,7 @@ public class AmenityController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'amenity.read')")
     @Operation(summary = "Get all amenities with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<AmenityResponse>>> getAllAmenities(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -65,7 +65,7 @@ public class AmenityController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'RESIDENT', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'amenity.read')")
     @Operation(summary = "Get amenities by estate")
     public ResponseEntity<ApiResponse<PagedResponse<AmenityResponse>>> getAmenitiesByEstate(
             @PathVariable UUID estateId,
@@ -75,7 +75,7 @@ public class AmenityController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'amenity.update')")
     @Operation(summary = "Update amenity status")
     public ResponseEntity<ApiResponse<AmenityResponse>> updateAmenityStatus(
             @PathVariable UUID id,
@@ -85,7 +85,7 @@ public class AmenityController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'amenity.delete')")
     @Operation(summary = "Soft-delete an amenity")
     public ResponseEntity<ApiResponse<Void>> deleteAmenity(@PathVariable UUID id) {
         amenityService.deleteAmenity(id);
@@ -93,7 +93,7 @@ public class AmenityController {
     }
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'amenity.read')")
     @Operation(summary = "Get amenity dashboard")
     public ResponseEntity<ApiResponse<AmenityDashboardResponse>> getDashboard() {
         AmenityDashboardResponse response = amenityService.getDashboard();

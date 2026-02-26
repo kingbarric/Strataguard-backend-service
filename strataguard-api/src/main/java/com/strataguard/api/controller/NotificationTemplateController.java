@@ -25,7 +25,7 @@ public class NotificationTemplateController {
     private final NotificationTemplateService templateService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "Create a notification template")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> create(
             @Valid @RequestBody NotificationTemplateRequest request) {
@@ -35,7 +35,7 @@ public class NotificationTemplateController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "List all notification templates")
     public ResponseEntity<ApiResponse<List<NotificationTemplateResponse>>> getAll() {
         List<NotificationTemplateResponse> response = templateService.getAll();
@@ -43,7 +43,7 @@ public class NotificationTemplateController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "Get a notification template by ID")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> getById(@PathVariable UUID id) {
         NotificationTemplateResponse response = templateService.getById(id);
@@ -51,7 +51,7 @@ public class NotificationTemplateController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "Update a notification template")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> update(
             @PathVariable UUID id,
@@ -61,7 +61,7 @@ public class NotificationTemplateController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "Soft-delete a notification template")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         templateService.delete(id);
@@ -69,7 +69,7 @@ public class NotificationTemplateController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'notification.template_manage')")
     @Operation(summary = "Get notification templates by estate")
     public ResponseEntity<ApiResponse<List<NotificationTemplateResponse>>> getByEstateId(
             @PathVariable UUID estateId) {

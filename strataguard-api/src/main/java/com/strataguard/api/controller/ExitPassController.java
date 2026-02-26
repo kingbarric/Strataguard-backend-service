@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,6 +21,7 @@ public class ExitPassController {
     private final ExitPassService exitPassService;
 
     @GetMapping("/vehicle/{vehicleId}")
+    @PreAuthorize("hasPermission(null, 'exit_pass.generate')")
     @Operation(summary = "Generate a dynamic exit pass token for a vehicle")
     public ResponseEntity<ApiResponse<ExitPassResponse>> generateExitPass(@PathVariable UUID vehicleId) {
         ExitPassResponse response = exitPassService.generateExitPass(vehicleId);

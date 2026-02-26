@@ -43,4 +43,11 @@ public interface ResidentRepository extends JpaRepository<Resident, UUID> {
 
     @Query("SELECT COUNT(r) FROM Resident r WHERE r.tenantId = :tenantId AND r.deleted = false")
     long countByTenantId(@Param("tenantId") UUID tenantId);
+
+    @Query("SELECT DISTINCT r FROM Resident r JOIN Tenancy t ON r.id = t.residentId " +
+            "JOIN Unit u ON t.unitId = u.id " +
+            "WHERE u.estateId = :estateId AND r.tenantId = :tenantId AND r.deleted = false")
+    Page<Resident> findByEstateIdAndTenantId(@Param("estateId") UUID estateId,
+                                              @Param("tenantId") UUID tenantId,
+                                              Pageable pageable);
 }

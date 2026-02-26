@@ -28,7 +28,7 @@ public class GateController {
     private final GateService gateService;
 
     @PostMapping("/entry")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'gate.entry')")
     @Operation(summary = "Process vehicle entry by scanning QR sticker")
     public ResponseEntity<ApiResponse<GateEntryResponse>> processEntry(
             @Valid @RequestBody GateEntryRequest request) {
@@ -38,7 +38,7 @@ public class GateController {
     }
 
     @PostMapping("/exit")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'gate.exit')")
     @Operation(summary = "Process vehicle exit with QR sticker and exit pass token")
     public ResponseEntity<ApiResponse<GateExitResponse>> processExit(
             @Valid @RequestBody GateExitRequest request) {
@@ -47,7 +47,7 @@ public class GateController {
     }
 
     @PostMapping("/exit/remote/{sessionId}")
-    @PreAuthorize("hasRole('SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'gate.exit')")
     @Operation(summary = "Process vehicle exit after remote approval")
     public ResponseEntity<ApiResponse<GateExitResponse>> processRemoteApprovalExit(
             @PathVariable UUID sessionId) {
@@ -56,7 +56,7 @@ public class GateController {
     }
 
     @GetMapping("/sessions/{id}")
-    @PreAuthorize("hasAnyRole('SECURITY_GUARD', 'ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'gate.session_read')")
     @Operation(summary = "Get gate session by ID")
     public ResponseEntity<ApiResponse<GateSessionResponse>> getSession(@PathVariable UUID id) {
         GateSessionResponse response = gateService.getSession(id);
@@ -64,7 +64,7 @@ public class GateController {
     }
 
     @GetMapping("/sessions")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'gate.session_read')")
     @Operation(summary = "Get all gate sessions with pagination")
     public ResponseEntity<ApiResponse<PagedResponse<GateSessionResponse>>> getAllSessions(
             @PageableDefault(size = 20, sort = "entryTime", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -73,7 +73,7 @@ public class GateController {
     }
 
     @GetMapping("/sessions/open")
-    @PreAuthorize("hasAnyRole('SECURITY_GUARD', 'ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'gate.session_read')")
     @Operation(summary = "Get all currently open gate sessions")
     public ResponseEntity<ApiResponse<PagedResponse<GateSessionResponse>>> getOpenSessions(
             @PageableDefault(size = 20, sort = "entryTime", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -82,7 +82,7 @@ public class GateController {
     }
 
     @GetMapping("/sessions/vehicle/{vehicleId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'gate.session_read')")
     @Operation(summary = "Get gate sessions for a specific vehicle")
     public ResponseEntity<ApiResponse<PagedResponse<GateSessionResponse>>> getSessionsByVehicle(
             @PathVariable UUID vehicleId,
@@ -92,7 +92,7 @@ public class GateController {
     }
 
     @GetMapping("/logs")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'gate.log_read')")
     @Operation(summary = "Get all gate access logs")
     public ResponseEntity<ApiResponse<PagedResponse<GateAccessLogResponse>>> getAllAccessLogs(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -101,7 +101,7 @@ public class GateController {
     }
 
     @GetMapping("/logs/session/{sessionId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN', 'SECURITY_GUARD')")
+    @PreAuthorize("hasPermission(null, 'gate.log_read')")
     @Operation(summary = "Get access logs for a specific gate session")
     public ResponseEntity<ApiResponse<PagedResponse<GateAccessLogResponse>>> getAccessLogsBySession(
             @PathVariable UUID sessionId,
@@ -111,7 +111,7 @@ public class GateController {
     }
 
     @GetMapping("/logs/vehicle/{vehicleId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'gate.log_read')")
     @Operation(summary = "Get access logs for a specific vehicle")
     public ResponseEntity<ApiResponse<PagedResponse<GateAccessLogResponse>>> getAccessLogsByVehicle(
             @PathVariable UUID vehicleId,

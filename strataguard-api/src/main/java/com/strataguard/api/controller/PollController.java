@@ -34,7 +34,7 @@ public class PollController {
     private final ResidentRepository residentRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.create')")
     @Operation(summary = "Create a new poll")
     public ResponseEntity<ApiResponse<PollResponse>> createPoll(
             @Valid @RequestBody CreatePollRequest request,
@@ -47,7 +47,7 @@ public class PollController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.read')")
     @Operation(summary = "Get poll by ID")
     public ResponseEntity<ApiResponse<PollResponse>> getPoll(@PathVariable UUID id) {
         PollResponse response = pollService.getPoll(id);
@@ -55,7 +55,7 @@ public class PollController {
     }
 
     @GetMapping("/estate/{estateId}")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.read')")
     @Operation(summary = "Get polls by estate")
     public ResponseEntity<ApiResponse<PagedResponse<PollResponse>>> getPollsByEstate(
             @PathVariable UUID estateId,
@@ -65,7 +65,7 @@ public class PollController {
     }
 
     @GetMapping("/estate/{estateId}/active")
-    @PreAuthorize("hasAnyRole('RESIDENT', 'ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.read')")
     @Operation(summary = "Get active polls for estate")
     public ResponseEntity<ApiResponse<PagedResponse<PollResponse>>> getActivePolls(
             @PathVariable UUID estateId,
@@ -75,7 +75,7 @@ public class PollController {
     }
 
     @PostMapping("/{id}/activate")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.update')")
     @Operation(summary = "Activate a poll")
     public ResponseEntity<ApiResponse<PollResponse>> activatePoll(@PathVariable UUID id) {
         PollResponse response = pollService.activatePoll(id);
@@ -83,7 +83,7 @@ public class PollController {
     }
 
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'FACILITY_MANAGER')")
+    @PreAuthorize("hasPermission(null, 'poll.close')")
     @Operation(summary = "Close a poll")
     public ResponseEntity<ApiResponse<PollResponse>> closePoll(@PathVariable UUID id) {
         PollResponse response = pollService.closePoll(id);
@@ -91,7 +91,7 @@ public class PollController {
     }
 
     @PostMapping("/{id}/vote")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasPermission(null, 'poll.vote')")
     @Operation(summary = "Cast a vote on a poll")
     public ResponseEntity<ApiResponse<Void>> castVote(
             @PathVariable UUID id,
@@ -103,7 +103,7 @@ public class PollController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ESTATE_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'poll.delete')")
     @Operation(summary = "Delete a poll")
     public ResponseEntity<ApiResponse<Void>> deletePoll(@PathVariable UUID id) {
         pollService.deletePoll(id);

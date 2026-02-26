@@ -27,7 +27,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.read')")
     @Operation(summary = "Get all audit logs (paginated)")
     public ResponseEntity<ApiResponse<PagedResponse<AuditLogResponse>>> getAllLogs(
             @PageableDefault(size = 20, sort = "timestamp", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -36,7 +36,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.read')")
     @Operation(summary = "Filter audit logs by criteria")
     public ResponseEntity<ApiResponse<PagedResponse<AuditLogResponse>>> filterLogs(
             @ModelAttribute AuditLogFilterRequest filter,
@@ -46,7 +46,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/entity/{entityType}/{entityId}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.read')")
     @Operation(summary = "Get audit history for a specific entity")
     public ResponseEntity<ApiResponse<PagedResponse<AuditLogResponse>>> getEntityHistory(
             @PathVariable String entityType,
@@ -57,7 +57,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/summary")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.read')")
     @Operation(summary = "Get audit log summary statistics")
     public ResponseEntity<ApiResponse<AuditSummaryResponse>> getSummary() {
         AuditSummaryResponse response = auditLogService.getSummary();
@@ -65,7 +65,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/verify")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.export')")
     @Operation(summary = "Verify audit log hash chain integrity")
     public ResponseEntity<ApiResponse<Boolean>> verifyIntegrity(
             @RequestParam(defaultValue = "100") int limit) {
@@ -75,7 +75,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ESTATE_ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission(null, 'audit.read')")
     @Operation(summary = "Get audit log entry by ID")
     public ResponseEntity<ApiResponse<AuditLogResponse>> getAuditLog(@PathVariable UUID id) {
         AuditLogResponse response = auditLogService.getAuditLog(id);
